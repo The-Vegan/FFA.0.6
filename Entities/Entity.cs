@@ -23,6 +23,8 @@ public class Entity : AnimatedSprite
     public Vector2 prevPos;
 
     protected byte stun = 0, cooldown = 3;
+
+    
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
 

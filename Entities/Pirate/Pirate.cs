@@ -6,6 +6,18 @@ public class Pirate : Entity
 {
     /// A FAIRE
     /// RESOUDRE BUG DE ATKMOVE
+    /// 
+    /// IDENTIFIED
+    /// Glitch occurs because the check
+    /// to chose the attack occurs when a
+    /// movment is asked rather than performed
+    /// 
+    /// IDENTIFIE
+    /// Le glitch arrive car la verification
+    /// pour choisire le type d'attaque se
+    /// fait quand un movement est demandé
+    /// plutot que quand il est performé
+    /// 
     /// A FAIRE
     private List<List<Dictionary<String, short>>> DOWNMOVEATK = new List<List<Dictionary<string, short>>>();
     private List<List<Dictionary<String, short>>> LEFTMOVEATK = new List<List<Dictionary<string, short>>>();
