@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Level : TileMap
 {
@@ -54,6 +55,8 @@ public class Level : TileMap
 
     }
 
+    //ENTITY RELATED METHODS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     public void MoveEntity(Entity entity,Vector2 newTile)
     {
         //Checks if tile is walkable
@@ -61,8 +64,6 @@ public class Level : TileMap
         {
             entity.Moved(newTile);
         }
-
-
     }
 
     public void Spawn(Entity entity)
@@ -72,12 +73,30 @@ public class Level : TileMap
         
 
     }
-    
-    public void TimerUpdate()
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //ENTITY RELATED METHODS
+
+    //ATTACK RELATED METHODS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    public void CreateAtk(Entity source, List<List<Dictionary<String, short>>> atkData, String path, byte[] collumns, bool flipable)
+    {
+        Attack atkInstance = atkScene.Instance() as Attack;
+        atkInstance.InitAtk(source, atkData, this, path, collumns, flipable);
+        this.AddChild(atkInstance);
+    }
+
+
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //ATTACK RELATED METHODS
+    public async void TimerUpdate()
     {
         globalBeat++;
         
         GetTree().CallGroup("Entities", "BeatUpdate");
+
+        await ToSignal(GetTree(), "idle_frame");
+
+        GetTree().CallGroup("Attacks", "BeatAtkUpdate");
     }
 
 }

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Entity : AnimatedSprite
 {
@@ -25,10 +26,24 @@ public class Entity : AnimatedSprite
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
 
+    //ATTACK VARIABLES
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    protected String atkFolder;
+    protected byte[] animPerBeat;
+    protected bool flippableAnim = false;
+
+    protected List<List<Dictionary<String, short>>> DOWNATK = new List<List<Dictionary<String, short>>>();
+    protected List<List<Dictionary<String, short>>> LEFTATK = new List<List<Dictionary<String, short>>>();
+    protected List<List<Dictionary<String, short>>> RIGHTATK = new List<List<Dictionary<String, short>>>();
+    protected List<List<Dictionary<String, short>>> UPATK = new List<List<Dictionary<String, short>>>();
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //ATTACK VARIABLES
+
     //ANIMATION
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     bool damaged = false;
-    protected String Direction = "Down";
+    protected String direction = "Down";
+    protected String action;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ANIMATION
 
@@ -55,7 +70,7 @@ public class Entity : AnimatedSprite
         this.packet |= p;
     }
 
-    protected short PacketParser(short packetToParse)
+    protected virtual short PacketParser(short packetToParse)
     {
         //Rest
         if (packetToParse >= 512) return 512;
@@ -64,7 +79,7 @@ public class Entity : AnimatedSprite
         bool item = false;
         if (packetToParse >= 256) item = true;
 
-        if ((packetToParse & 0b0000_0001) != 0) parsedPacket = 1;
+        if      ((packetToParse & 0b0000_0001) != 0) parsedPacket = 1;
         else if ((packetToParse & 0b0000_0010) != 0) parsedPacket = 2;
         else if ((packetToParse & 0b0000_0100) != 0) parsedPacket = 4;
         else if ((packetToParse & 0b0000_1000) != 0) parsedPacket = 8;
@@ -86,28 +101,41 @@ public class Entity : AnimatedSprite
 
     //GESTION DES MOUVEMENTS
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    protected void AskMovement()
+    protected bool AskMovement()
     {
         packet = PacketParser(packet);
 
-        
+        //if none of movement bits are set to true
+        if ((packet & 0b1111) == 0) return false;
 
-        if      ((packet & 0b0001) != 0) map.MoveEntity(this, pos + Vector2.Down);
+        if ((packet & 0b0001) != 0) map.MoveEntity(this, pos + Vector2.Down);
         else if ((packet & 0b0010) != 0) map.MoveEntity(this, pos + Vector2.Left);
         else if ((packet & 0b0100) != 0) map.MoveEntity(this, pos + Vector2.Right);
         else if ((packet & 0b1000) != 0) map.MoveEntity(this, pos + Vector2.Up);
-        
+
+        return true;
+    }
+
+    protected virtual void AskAtk(bool hasAlreadyMoved)
+    {
+        //Only the AskMovement method may be used as parameter
+        if (hasAlreadyMoved) return;
+
+        action ="Atk";
+        if      ((packet & 0b0001_0000) != 0) map.CreateAtk(this, DOWNATK,atkFolder + "DownAtk",animPerBeat,flippableAnim);
+        else if ((packet & 0b0010_0000) != 0) map.CreateAtk(this, LEFTATK, atkFolder + "LeftAtk", animPerBeat, flippableAnim);
+        else if ((packet & 0b0100_0000) != 0) map.CreateAtk(this, RIGHTATK, atkFolder + "RightAtk", animPerBeat, flippableAnim);
+        else if ((packet & 0b1000_0000) != 0) map.CreateAtk(this, UPATK, atkFolder + "UpAtk", animPerBeat, flippableAnim);
+
     }
 
     public void Moved(Vector2 newTile)
     {
-
+        map.SetCell((int)pos.x, (int)pos.y, 0);
         
         pos = newTile;
-
-        this.Play("Idle" + Direction);
-        
-        MidBeatAnimManager();
+        map.SetCell((int)pos.x, (int)pos.y, 3);
+        action = "Idle";
 
         tween.InterpolateProperty(this, "position",                         //Property to interpolate
             this.Position, new Vector2((pos.x * 64) + 32, (pos.y * 64) + 16),//initVal,FinalVal
@@ -132,16 +160,39 @@ public class Entity : AnimatedSprite
         }
         else
         {
-            this.Play("Wait" + Direction);
+            switch (action)
+            {
+                case "Idle":
+                case "Cooldown":
+                    action = "Wait";
+                    break;
+                case "Atk":
+                    action = "Cooldown";
+                    break;
+                    
+            }
+
+
+
+            this.Play(action + direction);
         }
 
     }
+
+    private void OnBeatAnimManager()
+    {
+
+
+
+
+    }
+
     private void DirectionSetter()
     {
-        if      ((packet & 0b0001_0001) != 0) Direction = "Down";
-        else if ((packet & 0b0010_0010) != 0) Direction = "Left";
-        else if ((packet & 0b0100_0100) != 0) Direction = "Right";
-        else if ((packet & 0b1000_1000) != 0) Direction = "Up";
+        if      ((packet & 0b0001_0001) != 0) direction = "Down";
+        else if ((packet & 0b0010_0010) != 0) direction = "Left";
+        else if ((packet & 0b0100_0100) != 0) direction = "Right";
+        else if ((packet & 0b1000_1000) != 0) direction = "Up";
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //GESTION DES ANIMATIONS
@@ -151,18 +202,28 @@ public class Entity : AnimatedSprite
     protected void BeatUpdate()
     {
         if (stun != 0) { cooldown = 0; stun--; return; }
-        if (cooldown != 0){cooldown--;return;}
-
-        DirectionSetter();
-
-        if ((packet & 0b1111) != 0)//check for movement
+        if (cooldown != 0)
         {
-            AskMovement();
+            cooldown--;
+            return;
         }
 
+        DirectionSetter();
+        GD.Print(packet);//--------------------------------------------------------------
+        if(packet == 0)
+        {
+            this.Play("FailedInput");
+            action = "Idle";
+            MidBeatAnimManager();
+            return;
+        }
+        //If the player moves, AskMovement returns true and skips AskAtk
+        //This structure is meant to simplify the override for Pirate
+        AskAtk(AskMovement());
+        
 
-
-
+        this.Play(action + direction);
+        MidBeatAnimManager();
 
         //VALUES RESETS
         //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<

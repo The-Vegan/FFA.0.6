@@ -1,12 +1,21 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFA.0.6", "FFA.0.6.csproj", "{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32901.82
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFA.0.6", "FFA.0.6.csproj", "{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{386A30CE-7AC6-4C47-A218-EB814FE83F1F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-	Debug|Any CPU = Debug|Any CPU
-	ExportDebug|Any CPU = ExportDebug|Any CPU
-	ExportRelease|Any CPU = ExportRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -15,5 +24,13 @@ Global
 		{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}.Release|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{6F18CEEB-C6BE-44F9-8E69-E1D7EF9ADE28}.Release|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D1EB4BC-EEEE-4396-99A7-0AA6DDCED7D7}
 	EndGlobalSection
 EndGlobal

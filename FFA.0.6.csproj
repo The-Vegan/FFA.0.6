@@ -3,4 +3,15 @@
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>FFA.Empty.Empty</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="GodotSharp">
+      <Private>true</Private>
+    </Reference>
+    <Reference Update="GodotSharpEditor">
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
 </Project>
