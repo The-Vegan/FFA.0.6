@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -15,6 +15,12 @@ public class Level : TileMap
     //DEPENDANCIES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
+    protected List<Entity> allEntities = new List<Entity>();
+
+    [Signal]
+    protected delegate void allEntitiesAreDone();
+    protected byte doneEntities = 0;
+
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDANCIES
 
@@ -22,8 +28,8 @@ public class Level : TileMap
     {
         //DEBUG (REMOVE LATER)
         //______________________________________
-        spawnpoints[0] = Vector2.Zero;
-        spawnpoints[1] = Vector2.Zero;
+        spawnpoints[0] = new Vector2(0, 0);
+        spawnpoints[1] = new Vector2(0, 0);
 
         spawnpoints[2] = new Vector2(15, 0);
         spawnpoints[3] = new Vector2(15, 0);
@@ -50,9 +56,6 @@ public class Level : TileMap
 
         //______________________________________
         //DEBUG (REMOVE LATER)
-
-
-
     }
 
     //ENTITY RELATED METHODS
@@ -64,6 +67,10 @@ public class Level : TileMap
         {
             entity.Moved(newTile);
         }
+        else
+        {
+            entity.Moved(entity.pos);
+        }
     }
 
     public void Spawn(Entity entity)
@@ -72,6 +79,13 @@ public class Level : TileMap
         entity.Visible = true;
         
 
+    }
+
+    protected void EntityDone()//Signal method : is triggered when an entity has finished it's BeatUpdate coroutine
+    {
+        doneEntities++;
+        GD.Print(allEntities.Count);
+        if (doneEntities == allEntities.Count) EmitSignal("allEntitiesAreDone");
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ENTITY RELATED METHODS
@@ -94,7 +108,7 @@ public class Level : TileMap
         
         GetTree().CallGroup("Entities", "BeatUpdate");
 
-        await ToSignal(GetTree(), "idle_frame");
+        await ToSignal(this, "allEntitiesAreDone");
 
         GetTree().CallGroup("Attacks", "BeatAtkUpdate");
     }

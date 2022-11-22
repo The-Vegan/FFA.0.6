@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 
 public class DamageTile : AnimatedSprite
@@ -29,6 +29,7 @@ public class DamageTile : AnimatedSprite
 
     public override void _Ready()
     {
+        GD.Print("DamageTile created");
 
         this.Play(animation);
         this.FlipH = flippedH;

@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -59,10 +59,12 @@ public class Attack : Node2D
     private void BeatAtkUpdate()
     {
         currentBeat++;
-
+        GD.Print(currentBeat);
+        GD.Print(maxBeat);
         if (currentBeat > maxBeat)
         {
-            //this.QueueFree();
+            GD.Print("freeing atk");
+            this.QueueFree();
             return;
         }
         beatAnimPath = folderPath + "F" + currentBeat + ".png";
@@ -81,6 +83,7 @@ public class Attack : Node2D
                                      new Vector2((gridPos.x + currentTile["X"]), (gridPos.y + currentTile["Y"])),
                                      currentTile["ANIM"],
                                      currentTile["DAMAGE"]);
+                    
 
                     if (!keyChain.Contains(currentTile["KEY"]))
                     {
@@ -102,8 +105,8 @@ public class Attack : Node2D
     {
         DamageTile instancedDTS = (DamageTile)damageTileScene.Instance();
         Vector2 tile = gridPos + tilePos;
-        
-        
+
+        GD.Print("CreateDamageTileCalled");
         bool flippableX = false, flippableY = false;
         if (flipableAnims)
         {
@@ -112,7 +115,7 @@ public class Attack : Node2D
             
         }
         instancedDTS.InitDamageTile(source, tile ,"c" + anim,texture,damage,flippableX,flippableY);//Change the falses by flipable arguments later
-        
+        GD.Print("CreateDamageTile Initialised -DT");
         this.AddChild(instancedDTS, true);
         instancedDTS.Position += (tilePos - gridPos) * 64;
     }
@@ -131,6 +134,7 @@ public class Attack : Node2D
         {
             spriteSheet = GD.Load("res://Entities/Default.png") as Texture;
             animations[currentBeat - 1] = 1;
+            GD.Print("ERR : COULDN'T FIND FILE " + beatAnimPath);
         }
         //File not found
 
