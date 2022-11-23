@@ -1,5 +1,6 @@
-using Godot;
+﻿using Godot;
 using System;
+using System.Collections.Generic;
 
 public class Level : TileMap
 {
@@ -14,6 +15,12 @@ public class Level : TileMap
     //DEPENDANCIES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
+    protected List<Entity> allEntities = new List<Entity>();
+
+    [Signal]
+    protected delegate void allEntitiesAreDone();
+    protected byte doneEntities = 0;
+
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDANCIES
 
@@ -21,8 +28,8 @@ public class Level : TileMap
     {
         //DEBUG (REMOVE LATER)
         //______________________________________
-        spawnpoints[0] = Vector2.Zero;
-        spawnpoints[1] = Vector2.Zero;
+        spawnpoints[0] = new Vector2(0, 0);
+        spawnpoints[1] = new Vector2(0, 0);
 
         spawnpoints[2] = new Vector2(15, 0);
         spawnpoints[3] = new Vector2(15, 0);
@@ -49,11 +56,10 @@ public class Level : TileMap
 
         //______________________________________
         //DEBUG (REMOVE LATER)
-
-
-
     }
 
+    //ENTITY RELATED METHODS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     public void MoveEntity(Entity entity,Vector2 newTile)
     {
         //Checks if tile is walkable
@@ -61,8 +67,10 @@ public class Level : TileMap
         {
             entity.Moved(newTile);
         }
-
-
+        else
+        {
+            entity.Moved(entity.pos);
+        }
     }
 
     public void Spawn(Entity entity)
@@ -72,12 +80,37 @@ public class Level : TileMap
         
 
     }
-    
-    public void TimerUpdate()
+
+    protected void EntityDone()//Signal method : is triggered when an entity has finished it's BeatUpdate coroutine
+    {
+        doneEntities++;
+        GD.Print(allEntities.Count);
+        if (doneEntities == allEntities.Count) EmitSignal("allEntitiesAreDone");
+    }
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //ENTITY RELATED METHODS
+
+    //ATTACK RELATED METHODS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    public void CreateAtk(Entity source, List<List<Dictionary<String, short>>> atkData, String path, byte[] collumns, bool flipable)
+    {
+        Attack atkInstance = atkScene.Instance() as Attack;
+        atkInstance.InitAtk(source, atkData, this, path, collumns, flipable);
+        this.AddChild(atkInstance);
+    }
+
+
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //ATTACK RELATED METHODS
+    public async void TimerUpdate()
     {
         globalBeat++;
         
         GetTree().CallGroup("Entities", "BeatUpdate");
+
+        await ToSignal(this, "allEntitiesAreDone");
+
+        GetTree().CallGroup("Attacks", "BeatAtkUpdate");
     }
 
 }

@@ -1,21 +1,42 @@
-using Godot;
+﻿using Godot;
 using System;
 
 public class DamageTile : AnimatedSprite
 {
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
+    private Entity source;
+    private Vector2 coordinates;
+    private String animation;
+    private SpriteFrames texture;
 
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
+    private bool flippedH = false, flippedV = false;
+    private short damage;
+    
+
+    public void InitDamageTile(Entity attacker,Vector2 pos,String anim,SpriteFrames sf,short punch,bool flippedX, bool flippedY)
     {
-        
+        this.source = attacker;
+        this.coordinates = pos;
+        this.animation = anim;
+        this.flippedH = flippedX;
+        this.flippedV = flippedY;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        this.SetSpriteFrames(sf);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        this.damage = punch;
     }
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+    public override void _Ready()
+    {
+        GD.Print("DamageTile created");
+
+        this.Play(animation);
+        this.FlipH = flippedH;
+        this.FlipV = flippedV;
+        //play the animation
+
+        this.Connect("animation_finished", this, "queue_free");
+    }
+
 }
