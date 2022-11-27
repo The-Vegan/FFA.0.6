@@ -27,9 +27,7 @@ public class Entity : AnimatedSprite
     public Vector2 prevPos;
 
     protected byte stun = 0, cooldown = 3;
-
-    [Signal]
-    delegate void movedByLevel(bool true_tho);
+    
     protected bool reallyMoved = false;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
@@ -63,13 +61,12 @@ public class Entity : AnimatedSprite
         map = level;
         controllerScene = c;
 
-        this.Connect("movedByLevel", this, "SetRealyMoved");
         this.Connect("entityIsDone", map, "EntityDone");
+        
     }
-    async public override void _Ready()
+    public override void _Ready()
     {
         tween = (Tween)this.GetNode("Tween");
-        await ToSignal(GetTree(), "idle_frame");
         controller = controllerScene.Instance() as GenericController;
         this.AddChild(controller);
     }
@@ -115,7 +112,6 @@ public class Entity : AnimatedSprite
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected void AskMovement()
     {
-        packet = PacketParser(packet);
 
         //if none of movement bits are set to true
         if ((packet & 0b1111) == 0) return;
@@ -138,10 +134,15 @@ public class Entity : AnimatedSprite
 
     public void Moved(Vector2 newTile)
     {
-        if (pos == newTile) 
-            EmitSignal("movedByLevel", false);
-        else 
-            EmitSignal("movedByLevel", true);
+        if (pos == newTile)
+        {
+            SetRealyMoved(false);
+            return;
+        }
+            
+            
+        else
+            SetRealyMoved(true);
 
 
         map.SetCell((int)pos.x, (int)pos.y, 0);
@@ -223,33 +224,39 @@ public class Entity : AnimatedSprite
 
     protected void BeatUpdate()
     {
-        if (stun != 0) { cooldown = 0; stun--; return; }
+        if (stun != 0)
+        {
+            EmitSignal("entityIsDone");
+            cooldown = 0;
+            stun--;
+            return;
+        }
         if (cooldown != 0)
         {
+            EmitSignal("entityIsDone");
             cooldown--;
             return;
         }
-
-        DirectionSetter();
-        
         if(packet == 0)
         {
+            EmitSignal("entityIsDone");
             this.Play("FailedInput");
             action = "Idle";
             MidBeatAnimManager();
             return;
         }
-        //If the player moves, AskMovement returns true and skips AskAtk
-        //This structure is meant to simplify the override for Pirate
+
+        packet = PacketParser(packet);
         AskMovement();
+        DirectionSetter();
         AskAtk();
         
-
         this.Play(action + direction);
         MidBeatAnimManager();
 
         //VALUES RESETS
         //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<
+        EmitSignal("entityIsDone");
         packet = 0;
         //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<
         //VALUES RESETS

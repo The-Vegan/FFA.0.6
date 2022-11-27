@@ -170,17 +170,13 @@ public class Pirate : Entity
         return base.PacketParser(packetToParse);
     }
 
-    protected override async void AskAtk()
+    protected override void AskAtk()
     {
         if ((packet & 0b1111_0000) == 0) return;
         action = "Atk";
         
-        if (((packet & 0b1111_0000) >> 4) == (packet & 0b1111))//if atempted to dash-atk
+        if (((packet >> 4) == (packet & 0b1111)) && (reallyMoved))//if dash-atk
         {
-            GD.Print("Got in DeadLock");
-            await ToSignal(this, "movedByLevel");//Signal wait to check if movement occured
-            GD.Print("BrokeOut of DeadLock");
-            if (!reallyMoved) return;
 
             if      (packet == 0b0001_0001) map.CreateAtk(this, DOWNMOVEATK, atkFolder + "DownMoveAtk", animPerBeat, flippableAnim);
             else if (packet == 0b0010_0010) map.CreateAtk(this, LEFTMOVEATK, atkFolder + "LeftMoveAtk", animPerBeat, flippableAnim);

@@ -51,6 +51,7 @@ public class Level : TileMap
         pirate.Init(this, controllScene);
         this.AddChild(pirate);
         Spawn(pirate);
+        allEntities.Add(pirate);
 
         //STATIC ENTITY INSTANCING
 
@@ -84,8 +85,7 @@ public class Level : TileMap
     protected void EntityDone()//Signal method : is triggered when an entity has finished it's BeatUpdate coroutine
     {
         doneEntities++;
-        GD.Print(allEntities.Count);
-        if (doneEntities == allEntities.Count) EmitSignal("allEntitiesAreDone");
+        if (doneEntities >= allEntities.Count) EmitSignal("allEntitiesAreDone");
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ENTITY RELATED METHODS

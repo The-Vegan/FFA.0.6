@@ -29,7 +29,6 @@ public class DamageTile : AnimatedSprite
 
     public override void _Ready()
     {
-        GD.Print("DamageTile created");
 
         this.Play(animation);
         this.FlipH = flippedH;

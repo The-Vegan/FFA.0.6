@@ -48,7 +48,7 @@ public class Attack : Node2D
         this.gridPos = source.pos;
 
 
-        this.Position = source.Position;
+        this.Position = (source.pos * 64) + new Vector2(32,16);
     }
 
     public override void _Ready()
@@ -59,11 +59,9 @@ public class Attack : Node2D
     private void BeatAtkUpdate()
     {
         currentBeat++;
-        GD.Print(currentBeat);
-        GD.Print(maxBeat);
+        
         if (currentBeat > maxBeat)
         {
-            GD.Print("freeing atk");
             this.QueueFree();
             return;
         }
@@ -103,10 +101,10 @@ public class Attack : Node2D
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected void CreateDamageTile(SpriteFrames texture, Vector2 tilePos, short anim, short damage)
     {
-        DamageTile instancedDTS = (DamageTile)damageTileScene.Instance();
+        DamageTile instancedDTS = damageTileScene.Instance() as DamageTile;
         Vector2 tile = gridPos + tilePos;
 
-        GD.Print("CreateDamageTileCalled");
+        
         bool flippableX = false, flippableY = false;
         if (flipableAnims)
         {
@@ -114,8 +112,10 @@ public class Attack : Node2D
             if (tilePos.y < 0) flippableY = true;
             
         }
+
+         
         instancedDTS.InitDamageTile(source, tile ,"c" + anim,texture,damage,flippableX,flippableY);//Change the falses by flipable arguments later
-        GD.Print("CreateDamageTile Initialised -DT");
+        
         this.AddChild(instancedDTS, true);
         instancedDTS.Position += (tilePos - gridPos) * 64;
     }
@@ -134,7 +134,6 @@ public class Attack : Node2D
         {
             spriteSheet = GD.Load("res://Entities/Default.png") as Texture;
             animations[currentBeat - 1] = 1;
-            GD.Print("ERR : COULDN'T FIND FILE " + beatAnimPath);
         }
         //File not found
 
