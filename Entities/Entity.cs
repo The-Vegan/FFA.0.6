@@ -150,7 +150,6 @@ public class Entity : AnimatedSprite
         pos = newTile;
         map.SetCell((int)pos.x, (int)pos.y, 3);
         action = "Idle";
-
         tween.InterpolateProperty(this, "position",                          //Property to interpolate
             this.Position, new Vector2((pos.x * 64) + 32, (pos.y * 64) + 16),//initVal,FinalVal
             0.33f,                                                           //Duration

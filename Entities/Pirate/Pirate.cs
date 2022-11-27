@@ -156,7 +156,7 @@ public class Pirate : Entity
 
     protected override short PacketParser(short packetToParse)
     {
-        if (((packetToParse & 0b1111_0000) >> 4) == (packetToParse & 0b1111))//move and Attack At the same time
+        if ((packetToParse >> 4) == (packetToParse & 0b1111))//move and Attack At the same time
         {
             short parsedPacket = 0;
             if ((packetToParse & 0b0001) != 0) parsedPacket = 17;

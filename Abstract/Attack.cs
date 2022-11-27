@@ -36,6 +36,10 @@ public class Attack : Node2D
     //ANIMATIONS
     public void InitAtk(Entity attacker ,List<List<Dictionary<String, short>>> atkData ,Level map,String path ,byte[] collumns ,bool flipable)
     {
+        
+
+       
+
         this.source = attacker;
         this.packagedAtkData = atkData;
         this.level = map;
@@ -85,6 +89,7 @@ public class Attack : Node2D
 
                     if (!keyChain.Contains(currentTile["KEY"]))
                     {
+                        
                         keyChain.Add(currentTile["KEY"]);
                     }
 
@@ -126,14 +131,15 @@ public class Attack : Node2D
         SpriteFrames sf = new SpriteFrames();
         byte rows = 20;
         if (currentBeat == maxBeat) rows = 10;
-
+       
         Texture spriteSheet = GD.Load(beatAnimPath) as Texture;
         
         //File not found
         if (spriteSheet == null)
         {
+           
             spriteSheet = GD.Load("res://Entities/Default.png") as Texture;
-            animations[currentBeat - 1] = 1;
+            
         }
         //File not found
 

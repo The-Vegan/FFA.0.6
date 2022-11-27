@@ -47,7 +47,9 @@ public class Level : TileMap
         //STATIC ENTITY INSTANCING
         PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
         PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
-        Pirate pirate = pirateScene.Instance() as Pirate;
+        PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
+        
+        Blahaj pirate = blahajScene.Instance() as Blahaj;
         pirate.Init(this, controllScene);
         this.AddChild(pirate);
         Spawn(pirate);
@@ -104,12 +106,13 @@ public class Level : TileMap
     //ATTACK RELATED METHODS
     public async void TimerUpdate()
     {
+        GD.Print("[Level] - - - - - - - - - - - - - - - - - - - - - - - -");
         globalBeat++;
         
         GetTree().CallGroup("Entities", "BeatUpdate");
-
+        GD.Print("[Level] Before allEntitiesAreDone");
         await ToSignal(this, "allEntitiesAreDone");
-
+        GD.Print("[Level] After allEntitiesAreDone");
         GetTree().CallGroup("Attacks", "BeatAtkUpdate");
     }
 
