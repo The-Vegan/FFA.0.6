@@ -49,7 +49,7 @@ public class Level : TileMap
         PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
         PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
         
-        Blahaj pirate = blahajScene.Instance() as Blahaj;
+        Entity pirate = blahajScene.Instance() as Entity;
         pirate.Init(this, controllScene);
         this.AddChild(pirate);
         Spawn(pirate);

@@ -34,6 +34,12 @@ public class Entity : AnimatedSprite
 
     //ATTACK VARIABLES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+
+    protected short healthPoint;
+    protected short maxHP;
+
+    protected List<Entity> damagedBy;
+
     protected String atkFolder;
     protected byte[] animPerBeat;
     protected bool flippableAnim = false;
@@ -218,7 +224,43 @@ public class Entity : AnimatedSprite
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //GESTION DES ANIMATIONS
+    //GESTION DES DEGATS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
 
+    public async void Damaged (Entity source,short damage)
+    {
+        if (!damagedBy.Contains(source))
+        {
+            damagedBy.Add(source);
+            healthPoint -= damage;
+            damaged = true;
+
+            source.HitSomeone(this,damage << 2 + 5);
+
+            await ToSignal(this, "animation_finished");
+            if(healthPoint <= 0)
+            {
+                Death()
+
+            }
+
+        }
+    }
+
+    protected void Death()
+    {
+
+
+    }
+
+
+    public void HitSomeone(Entity target,short points) 
+    {
+    
+    }
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //GESTION DES DEGATS
+    
 
 
     protected void BeatUpdate()

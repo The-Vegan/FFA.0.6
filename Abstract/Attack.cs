@@ -36,9 +36,6 @@ public class Attack : Node2D
     //ANIMATIONS
     public void InitAtk(Entity attacker ,List<List<Dictionary<String, short>>> atkData ,Level map,String path ,byte[] collumns ,bool flipable)
     {
-        
-
-       
 
         this.source = attacker;
         this.packagedAtkData = atkData;
@@ -107,19 +104,20 @@ public class Attack : Node2D
     protected void CreateDamageTile(SpriteFrames texture, Vector2 tilePos, short anim, short damage)
     {
         DamageTile instancedDTS = damageTileScene.Instance() as DamageTile;
-        Vector2 tile = gridPos + tilePos;
+        Vector2 tile = tilePos - gridPos;
 
         
         bool flippableX = false, flippableY = false;
         if (flipableAnims)
         {
-            if (tilePos.x < 0) flippableX = true;
-            if (tilePos.y < 0) flippableY = true;
+            if (tile.x < 0) flippableX = true;
+            if (tile.y < 0) flippableY = true;
+
             
         }
 
          
-        instancedDTS.InitDamageTile(source, tile ,"c" + anim,texture,damage,flippableX,flippableY);//Change the falses by flipable arguments later
+        instancedDTS.InitDamageTile(source, tilePos ,"c" + anim,texture,damage,flippableX,flippableY);//Change the falses by flipable arguments later
         
         this.AddChild(instancedDTS, true);
         instancedDTS.Position += (tilePos - gridPos) * 64;
@@ -137,7 +135,7 @@ public class Attack : Node2D
         //File not found
         if (spriteSheet == null)
         {
-           
+           GD.Print(beatAnimPath);
             spriteSheet = GD.Load("res://Entities/Default.png") as Texture;
             
         }
