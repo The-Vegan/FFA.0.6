@@ -235,12 +235,12 @@ public class Entity : AnimatedSprite
             healthPoint -= damage;
             damaged = true;
 
-            source.HitSomeone(this,damage << 2 + 5);
+            source.HitSomeone(this,(short)(damage << 2 + 5));
 
             await ToSignal(this, "animation_finished");
             if(healthPoint <= 0)
             {
-                Death()
+                Death();
 
             }
 
