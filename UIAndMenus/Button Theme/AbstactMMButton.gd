@@ -3,6 +3,8 @@ extends Button
 var mainMenu
 var destination : int
 
+signal gamemode
+
 const MAINMENU = 0
 const SOLO = 1
 const CLASSIC = 2
@@ -11,16 +13,18 @@ const CAMPAIGN = 4
 const CHARACTERSELECT = 5
 const LEVELSELECT = 6
 
-
+var mode = 0
 
 
 func _ready():
 	mainMenu = get_parent().get_parent()
 	$AnimatedSprite.play("Normal")
+	connect("gamemode",mainMenu,"setGameMode")
 
 #YOU NEED TO OVERRIDE THE DESINATION IN THE READY OVERRIDE
 func _pressed():
 	mainMenu.MoveCameraTo(destination)
+	emit_signal("gamemode",mode)
 
 func _notification(what):
 	match(what):

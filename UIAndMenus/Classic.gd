@@ -2,5 +2,5 @@ extends "res://UIAndMenus/Button Theme/AbstactMMButton.gd"
 
 func _ready():
 	._ready()
-	destination = CLASSIC
-
+	destination = CHARACTERSELECT
+	mode = 1

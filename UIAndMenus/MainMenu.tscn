@@ -524,9 +524,7 @@ script = ExtResource( 3 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="StartMenu/Solo"]
 frames = SubResource( 170 )
-animation = "Hovered"
-frame = 44
-playing = true
+animation = "Normal"
 centered = false
 
 [node name="SoloMenu" type="Container" parent="."]
@@ -542,9 +540,7 @@ script = ExtResource( 5 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Classic"]
 frames = SubResource( 170 )
-animation = "Hovered"
-frame = 36
-playing = true
+animation = "Normal"
 centered = false
 
 [node name="CTF" type="Button" parent="SoloMenu"]
@@ -555,34 +551,43 @@ script = ExtResource( 6 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/CTF"]
 frames = SubResource( 170 )
-animation = "Hovered"
-frame = 18
-playing = true
+animation = "Normal"
 centered = false
 
 [node name="Campaign" type="Button" parent="SoloMenu"]
 margin_top = 416.0
-margin_right = 12.0
-margin_bottom = 436.0
+margin_right = 256.0
+margin_bottom = 544.0
 script = ExtResource( 7 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Campaign"]
 frames = SubResource( 170 )
-animation = "Hovered"
-frame = 24
-playing = true
+animation = "Normal"
 centered = false
 
 [node name="Back" type="Button" parent="SoloMenu"]
 margin_left = 768.0
 margin_top = 448.0
-margin_right = 780.0
-margin_bottom = 468.0
+margin_right = 1024.0
+margin_bottom = 576.0
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Back"]
 frames = SubResource( 170 )
-animation = "Hovered"
-frame = 12
-playing = true
+animation = "Normal"
 centered = false
+
+[node name="CharacterSelect" type="Container" parent="."]
+margin_left = -1024.0
+margin_bottom = 576.0
+
+[node name="Pirate" type="Button" parent="CharacterSelect"]
+margin_right = 256.0
+margin_bottom = 128.0
+text = "Pirate"
+
+[node name="Blahaj" type="Button" parent="CharacterSelect"]
+margin_left = 320.0
+margin_right = 576.0
+margin_bottom = 128.0
+text = "Blahaj"
