@@ -14,17 +14,19 @@ const CHARACTERSELECT = 5
 const LEVELSELECT = 6
 
 var mode = 0
+var character = 0
+var levelSelected = 0
 
 
 func _ready():
 	mainMenu = get_parent().get_parent()
 	$AnimatedSprite.play("Normal")
-	connect("gamemode",mainMenu,"setGameMode")
+	connect("gamemode",mainMenu,"setGame")
 
 #YOU NEED TO OVERRIDE THE DESINATION IN THE READY OVERRIDE
 func _pressed():
 	mainMenu.MoveCameraTo(destination)
-	emit_signal("gamemode",mode)
+	emit_signal("gamemode",mode,character,levelSelected)
 
 func _notification(what):
 	match(what):

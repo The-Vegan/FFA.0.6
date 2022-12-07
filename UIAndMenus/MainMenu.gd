@@ -3,6 +3,11 @@ extends Control
 
 var camera : Camera2D
 
+var gameMode: int
+var playerCharacter: int
+var levelToLoad : int
+
+
 #Camera positions for menus
 const MAINMENU = Vector2(0,0)
 const SOLO = Vector2(0,-576)
@@ -36,7 +41,7 @@ func MoveCameraTo(var destination : int):
 			pass
 	
 
-func setGameMode(mode : int):
+func setGame(mode : int, character : int , selectedLevel : int):
 	
 	match(mode):
 		0:#None
@@ -47,5 +52,14 @@ func setGameMode(mode : int):
 			print("CTF")
 		3:#Campaign
 			print("Campaign")
+		
+	match(character):
+		_:
+			pass
+	
+	match(selectedLevel):
+		_:
+			pass
+	
 	
 	pass
