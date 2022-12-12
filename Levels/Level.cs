@@ -24,6 +24,12 @@ public class Level : TileMap
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDANCIES
 
+    public void initPlayerAndMode(int chosenCharacter,int gameMode,int chosenTeam)
+    {
+
+    }
+
+
     public override void _Ready()
     {
         //DEBUG (REMOVE LATER)

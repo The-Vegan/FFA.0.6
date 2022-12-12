@@ -521,6 +521,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 4 )
 
+[node name="Error" type="Label" parent="."]
+modulate = Color( 1, 0, 0, 0 )
+margin_left = 426.0
+margin_top = 230.0
+margin_right = 527.0
+margin_bottom = 273.0
+text = "An Error has occured"
+
+[node name="Tween" type="Tween" parent="Error"]
+
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
 current = true
@@ -616,3 +626,43 @@ script = ExtResource( 9 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="CharacterSelect/Blahaj"]
 frames = SubResource( 171 )
 animation = "Normal"
+
+[node name="Back" type="Button" parent="CharacterSelect"]
+margin_left = 768.0
+margin_top = 448.0
+margin_right = 1024.0
+margin_bottom = 576.0
+script = ExtResource( 2 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="CharacterSelect/Back"]
+frames = SubResource( 170 )
+animation = "Normal"
+centered = false
+
+[node name="LevelSelect" type="Container" parent="."]
+margin_left = -2048.0
+margin_right = -1024.0
+margin_bottom = 576.0
+
+[node name="Level1" type="Button" parent="LevelSelect"]
+margin_right = 144.0
+margin_bottom = 96.0
+text = "Ship 1"
+
+[node name="Level2" type="Button" parent="LevelSelect"]
+margin_left = 160.0
+margin_right = 304.0
+margin_bottom = 96.0
+text = "Kyomira 1"
+
+[node name="Back" type="Button" parent="LevelSelect"]
+margin_left = 768.0
+margin_top = 448.0
+margin_right = 1024.0
+margin_bottom = 576.0
+script = ExtResource( 2 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="LevelSelect/Back"]
+frames = SubResource( 170 )
+animation = "Normal"
+centered = false
