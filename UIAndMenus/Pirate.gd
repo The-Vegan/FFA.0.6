@@ -1,8 +1,6 @@
-extends "res://UIAndMenus/Button Theme/AbstactMMButton.gd"
-
+extends Button
+onready var mainMenu = get_parent().get_parent()
 func _ready():
-	._ready()
-	destination = LEVELSELECT
-	mode = mainMenu.gameMode
+	
 	character = 1
 	

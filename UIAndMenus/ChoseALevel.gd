@@ -2,5 +2,4 @@ extends "res://UIAndMenus/Button Theme/AbstactMMButton.gd"
 
 func _ready():
 	._ready()
-	destination = SOLO
-	mainMenu.waitForMultiplayer = false
+	destination = LEVELSELECT

@@ -8,14 +8,14 @@ public class Level : TileMap
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected short globalBeat = 0;
     protected Random rand = new Random();
-    protected Vector2[] spawnpoints = new Vector2[10];
+    protected Vector2[] spawnpoints = new Vector2[12];
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //Level Variable
 
     //DEPENDANCIES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    protected bool firstInitiation = true;
-    protected byte playerToWaitFor = 0;
+    protected bool waitForLocalPlayer = true;
+    protected bool waitForOtherPlayers = true;
 
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
     protected List<Entity> allEntities = new List<Entity>();
@@ -30,101 +30,57 @@ public class Level : TileMap
     protected PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
 
 
-    public void InitPlayerAndMode(int chosenCharacter,int gameMode,int chosenTeam)
+    public void InitPlayerAndMode(int chosenCharacter, int gameMode, int chosenTeam, bool waitForMultiPlayer)
     {
-        //gameMode contains 
-        if (firstInitiation)
+        //waitForOtherPlayer can also be set to false if the distant players are ready before the local player
+        if (!waitForMultiPlayer) waitForOtherPlayers = false;
+
+        switch (gameMode)//TODO : code the modes
         {
-            firstInitiation = false;
-            int mode = (gameMode - (gameMode % 10)) / 10; //devide by 10 and floors the result
+            /*
+             0: Classic
+             1: Team
+             2: CTF
+             3: Sacking
+             */
+            case 0:
 
-            switch (mode)
-            {
-                /*
-                 0: Classic
-                 1: Team
-                 2: CTF
-                 */
-                case 0:
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-            }
+                break;
+            case 1:
 
-            playerToWaitFor =(byte) ((gameMode % 10) + 1);
-            
-        }//Only enters when initialized for the forst time
+                break;
+            case 2:
 
-        String controllerScenePath;
+                break;
+            case 3:
 
-        if((chosenTeam & 0b1_00) == 0)
-        {
-            controllerScenePath = "res://Abstract/ControllerPlayer.tscn";
+                break;
         }
-        else
-        {
-            //^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^\\
-            //MULTIPLAYER CONTROLLER NOT YET CODED : HERE USING SINGLEPLAYER CONTROLLER
-            controllerScenePath = "res://Abstract/ControllerPlayer.tscn";
-            //v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^V\\
-            //controllerScenePath = "res://Abstract/ControllerMultiplayer.tscn";
-        }
-        PackedScene controllScene = GD.Load(controllerScenePath) as PackedScene;
+
+        
+        
+        Entity playerEntity;
+        //Selects correct entity from parameter ID
         switch (chosenCharacter)
         {
             case 1://Pirate
-                //Instancing pirate
-                Pirate pirate = pirateScene.Instance() as Pirate;
-                //Add pirate to Entity list
-                allEntities.Add(pirate);
-                //Gives pirate his controller
-                pirate.Init(this, controllScene);
-                //Adds the pirate to the scene tree
-                this.AddChild(pirate);
-
-                //Reduces Player counter (when 0, fills room with CPUs)
-                playerToWaitFor--;
+                playerEntity = pirateScene.Instance() as Pirate;       
                 break;
             case 2://♥
-                Blahaj blahaj = pirateScene.Instance() as Blahaj;
-                allEntities.Add(blahaj);
-                blahaj.Init(this, controllScene);
-                this.AddChild(blahaj);
-                playerToWaitFor--;
+                playerEntity = blahajScene.Instance() as Blahaj;
                 break;
 
             default:
-                break;
+                throw new Exception("InvalidEntityID");
+                
         }//End of characters switch statement
-        
-        if(playerToWaitFor <= 0)
-        {
-            controllerScenePath = "res://Abstract/ControllerCpu.tscn";
-            while (allEntities.Count < 10)
-            {
-                switch (rand.Next(2)+1)
-                {
-                    case 1:
-                        Pirate pirate = pirateScene.Instance() as Pirate;
-                        allEntities.Add(pirate);
-                        pirate.Init(this, controllScene);
-                        this.AddChild(pirate);
-                        break;
-                    case 2:
-                        Blahaj blahaj = pirateScene.Instance() as Blahaj;
-                        allEntities.Add(blahaj);
-                        blahaj.Init(this, controllScene);
-                        this.AddChild(blahaj);
-                        break;
 
-                    default:
-                        break;
-                }
-            }
-        }
+        PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
 
+        //Finalizes configurations for player entity
+        allEntities.Add(playerEntity);
+        playerEntity.Init(this, controllScene);
+        this.AddChild(playerEntity);
 
 
     }
@@ -132,32 +88,23 @@ public class Level : TileMap
 
     public override void _Ready()
     {
-        //DEBUG (REMOVE LATER)
-        //______________________________________
-        spawnpoints[0] = new Vector2(0, 0);
-        spawnpoints[1] = new Vector2(1, 0);
+        
+        /*
+         * TODO : ADD MULTIPLAYER IN THIS ELSE STATEMENT
+         * 
+        if (!waitForOtherPlayers && !waitForLocalPlayer)
+            SpawnAllEntities();
+        else
+            //somthing something : Connect, somthing something : "SpawnAllEntities"
+        */
+    }
 
-        spawnpoints[2] = new Vector2(15, 0);
-        spawnpoints[3] = new Vector2(14, 0);
-
-        spawnpoints[4] = new Vector2(0, 8);
-        spawnpoints[5] = new Vector2(1, 8);
-
-        spawnpoints[6] = new Vector2(15, 8);
-        spawnpoints[7] = new Vector2(14, 8);
-
-        spawnpoints[8] = new Vector2(7, 4);
-        spawnpoints[9] = new Vector2(7, 5);
-
-        //______________________________________
-        //DEBUG (REMOVE LATER)
-
-        //SpawningEntities
-        for(byte i = 0; i < allEntities.Count; i++)
+    protected void SpawnAllEntities()
+    {
+        for (int i = allEntities.Count; i < 12; i++)
         {
             Spawn(allEntities[i]);
         }
-
     }
 
     //ENTITY RELATED METHODS
@@ -177,7 +124,7 @@ public class Level : TileMap
 
     public void Spawn(Entity entity)
     {
-        int randomTile = rand.Next(10);
+        int randomTile = rand.Next(spawnpoints.Length);
 
         if(this.GetCell((int)spawnpoints[randomTile].x, (int)spawnpoints[randomTile].y) == 0)
         {

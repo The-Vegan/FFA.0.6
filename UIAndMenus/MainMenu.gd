@@ -5,8 +5,9 @@ var camera : Camera2D
 
 var gameMode: int
 var playerCharacter: int
-var team :int = 0
-
+var team : int = 0
+var numberOfPlayer : int = 1
+var waitForMultiplayer : bool = false
 
 #Camera positions for menus
 var back :int = 0
