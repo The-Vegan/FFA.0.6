@@ -2,6 +2,6 @@ extends "res://UIAndMenus/Button Theme/AbstactMMButton.gd"
 
 func _ready():
 	._ready()
-	destination = CTF
+	destination = CHARACTERSELECT
 	mode = 2
 

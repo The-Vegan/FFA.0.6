@@ -9,7 +9,7 @@ var team :int = 0
 
 
 #Camera positions for menus
-var back = Vector2(0,0)
+var back :int = 0
 const MAINMENU = Vector2(0,0)
 const SOLO = Vector2(0,-576)
 const CHARSELECT = Vector2(-1024,0)
@@ -39,16 +39,13 @@ func MoveCameraTo(var destination : int):
 			camera.position = MAINMENU
 		1:#solo
 			camera.position = SOLO
-		2:#classic
+		2:#character selection
 			camera.position = CHARSELECT
-		3:#ctf
-			camera.position = CHARSELECT
-		4:#campaign
-			pass
-		5:#character selection
-			pass
-		6:#level selection
-			pass
+		3:#level selection
+			camera.position = LEVELSELECT
+		_:#default
+			camera.position = MAINMENU
+		
 	
 
 func SetGame(mode : int, character : int):

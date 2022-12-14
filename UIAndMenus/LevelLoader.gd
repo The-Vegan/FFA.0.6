@@ -18,7 +18,7 @@ func _pressed():
 func GenerateLevel(lvlScene : PackedScene, character : int , mode : int):
 	var loadedLevel = lvlScene.instance()
 	
-	loadedLevel.initPlayerAndMode(character,mode,mainMenu.team)
+	loadedLevel.InitPlayerAndMode(character,mode,mainMenu.team)
 	#Cannot be replaced by change_scene bc instancing needs to be done
 	get_tree().root.add_child(loadedLevel)
 	

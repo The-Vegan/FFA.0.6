@@ -7,11 +7,8 @@ signal gamemode
 
 const MAINMENU = 0
 const SOLO = 1
-const CLASSIC = 2
-const CTF = 3
-const CAMPAIGN = 4
-const CHARACTERSELECT = 5
-const LEVELSELECT = 6
+const CHARACTERSELECT = 2
+const LEVELSELECT = 3
 
 var mode = 0
 var character = 0

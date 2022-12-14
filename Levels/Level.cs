@@ -14,6 +14,9 @@ public class Level : TileMap
 
     //DEPENDANCIES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    protected bool firstInitiation = true;
+    protected byte playerToWaitFor = 0;
+
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
     protected List<Entity> allEntities = new List<Entity>();
 
@@ -23,9 +26,106 @@ public class Level : TileMap
 
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDANCIES
+    protected PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
+    protected PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
 
-    public void initPlayerAndMode(int chosenCharacter,int gameMode,int chosenTeam)
+
+    public void InitPlayerAndMode(int chosenCharacter,int gameMode,int chosenTeam)
     {
+        //gameMode contains 
+        if (firstInitiation)
+        {
+            firstInitiation = false;
+            int mode = (gameMode - (gameMode % 10)) / 10; //devide by 10 and floors the result
+
+            switch (mode)
+            {
+                /*
+                 0: Classic
+                 1: Team
+                 2: CTF
+                 */
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+
+            playerToWaitFor =(byte) ((gameMode % 10) + 1);
+            
+        }//Only enters when initialized for the forst time
+
+        String controllerScenePath;
+
+        if((chosenTeam & 0b1_00) == 0)
+        {
+            controllerScenePath = "res://Abstract/ControllerPlayer.tscn";
+        }
+        else
+        {
+            //^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^\\
+            //MULTIPLAYER CONTROLLER NOT YET CODED : HERE USING SINGLEPLAYER CONTROLLER
+            controllerScenePath = "res://Abstract/ControllerPlayer.tscn";
+            //v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^v^V\\
+            //controllerScenePath = "res://Abstract/ControllerMultiplayer.tscn";
+        }
+        PackedScene controllScene = GD.Load(controllerScenePath) as PackedScene;
+        switch (chosenCharacter)
+        {
+            case 1://Pirate
+                //Instancing pirate
+                Pirate pirate = pirateScene.Instance() as Pirate;
+                //Add pirate to Entity list
+                allEntities.Add(pirate);
+                //Gives pirate his controller
+                pirate.Init(this, controllScene);
+                //Adds the pirate to the scene tree
+                this.AddChild(pirate);
+
+                //Reduces Player counter (when 0, fills room with CPUs)
+                playerToWaitFor--;
+                break;
+            case 2://♥
+                Blahaj blahaj = pirateScene.Instance() as Blahaj;
+                allEntities.Add(blahaj);
+                blahaj.Init(this, controllScene);
+                this.AddChild(blahaj);
+                playerToWaitFor--;
+                break;
+
+            default:
+                break;
+        }//End of characters switch statement
+        
+        if(playerToWaitFor <= 0)
+        {
+            controllerScenePath = "res://Abstract/ControllerCpu.tscn";
+            while (allEntities.Count < 10)
+            {
+                switch (rand.Next(2)+1)
+                {
+                    case 1:
+                        Pirate pirate = pirateScene.Instance() as Pirate;
+                        allEntities.Add(pirate);
+                        pirate.Init(this, controllScene);
+                        this.AddChild(pirate);
+                        break;
+                    case 2:
+                        Blahaj blahaj = pirateScene.Instance() as Blahaj;
+                        allEntities.Add(blahaj);
+                        blahaj.Init(this, controllScene);
+                        this.AddChild(blahaj);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+
 
     }
 
@@ -35,36 +135,29 @@ public class Level : TileMap
         //DEBUG (REMOVE LATER)
         //______________________________________
         spawnpoints[0] = new Vector2(0, 0);
-        spawnpoints[1] = new Vector2(0, 0);
+        spawnpoints[1] = new Vector2(1, 0);
 
         spawnpoints[2] = new Vector2(15, 0);
-        spawnpoints[3] = new Vector2(15, 0);
+        spawnpoints[3] = new Vector2(14, 0);
 
         spawnpoints[4] = new Vector2(0, 8);
-        spawnpoints[5] = new Vector2(0, 8);
+        spawnpoints[5] = new Vector2(1, 8);
 
         spawnpoints[6] = new Vector2(15, 8);
-        spawnpoints[7] = new Vector2(15, 8);
+        spawnpoints[7] = new Vector2(14, 8);
 
         spawnpoints[8] = new Vector2(7, 4);
-        spawnpoints[9] = new Vector2(7, 4);
-
-
-        //STATIC ENTITY INSTANCING
-        PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
-        PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
-        PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
-        
-        Entity pirate = blahajScene.Instance() as Entity;
-        pirate.Init(this, controllScene);
-        this.AddChild(pirate);
-        Spawn(pirate);
-        allEntities.Add(pirate);
-
-        //STATIC ENTITY INSTANCING
+        spawnpoints[9] = new Vector2(7, 5);
 
         //______________________________________
         //DEBUG (REMOVE LATER)
+
+        //SpawningEntities
+        for(byte i = 0; i < allEntities.Count; i++)
+        {
+            Spawn(allEntities[i]);
+        }
+
     }
 
     //ENTITY RELATED METHODS
@@ -84,8 +177,18 @@ public class Level : TileMap
 
     public void Spawn(Entity entity)
     {
-        entity.Moved(spawnpoints[rand.Next(10)]);
-        entity.Visible = true;
+        int randomTile = rand.Next(10);
+
+        if(this.GetCell((int)spawnpoints[randomTile].x, (int)spawnpoints[randomTile].y) == 0)
+        {
+            entity.Moved(spawnpoints[randomTile]);
+            entity.Visible = true;
+        }
+        else
+        {
+            //retry if tile is not a floor
+            Spawn(entity);
+        }
         
 
     }
