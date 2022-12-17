@@ -17,11 +17,17 @@ public class Level : TileMap
     protected bool waitForLocalPlayer = true;
     protected bool waitForOtherPlayers = true;
 
+    protected Entity mainPlayer;
+    protected Camera2D camera;
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
     protected List<Entity> allEntities = new List<Entity>();
 
     [Signal]
     protected delegate void allEntitiesAreDone();
+
+    [Signal]
+    protected delegate void loadComplete(bool success);
+
     protected byte doneEntities = 0;
 
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -56,12 +62,74 @@ public class Level : TileMap
 
                 break;
         }
+        PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
+
+        mainPlayer = CreateEntityInstance(chosenCharacter,controllScene);
 
         
-        
+        if (!waitForMultiPlayer) EmitSignal("loadComplete", true);
+        GD.Print("LoadCompleted in level");
+
+    }
+
+    public void InitDistantPlayer(List<int> otherPlayers)
+    {
+        if(otherPlayers.Count > 10)
+        {
+            EmitSignal("loadComplete", false);//Failed to load : too many players
+        }
+
+        PackedScene multiControll = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
+
+        for(int i = 0; i < otherPlayers.Count; i++)
+        {
+            Spawn(CreateEntityInstance(otherPlayers[i], multiControll));
+        }
+        waitForOtherPlayers = false;
+
+        if (!waitForLocalPlayer)
+        {
+            EmitSignal("loadComplet", true);
+        }
+    }
+
+    public override void _Ready()
+    {
+        camera = this.GetNode("Camera2D") as Camera2D;
+
+        this.RemoveChild(camera);
+
+        mainPlayer.AddChild(camera);
+
+        camera.Current = true;
+    }
+
+    protected void SpawnAllEntities()
+    {
+        //PackedScene cpu = GD.Load("res://Abstract/GenericController.cs") as PackedScene;
+        PackedScene cpu = GD.Load("res://Abstract/GenericController.tscn") as PackedScene;
+        for (int i = allEntities.Count; i < 11; i++)
+        {
+           CreateEntityInstance(cpu);
+        }
+        for (int i = 0; i < allEntities.Count; i++)
+        {
+            Spawn(allEntities[i]);
+        }
+
+    }
+
+    //ENTITY RELATED METHODS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    protected Entity CreateEntityInstance(PackedScene pcs)
+    {
+        return CreateEntityInstance(rand.Next(1,3), pcs);//Creates random entity
+    }
+    protected Entity CreateEntityInstance(int entityID,PackedScene controllScene)
+    {
         Entity playerEntity;
         //Selects correct entity from parameter ID
-        switch (chosenCharacter)
+        switch (entityID)
         {
             case 1://Pirate
                 playerEntity = pirateScene.Instance() as Pirate;       
@@ -70,45 +138,21 @@ public class Level : TileMap
                 playerEntity = blahajScene.Instance() as Blahaj;
                 break;
 
-            default:
-                throw new Exception("InvalidEntityID");
+            default://Random
                 
-        }//End of characters switch statement
+                return CreateEntityInstance(rand.Next(1, 3), controllScene);
 
-        PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
+        }//End of characters switch statement
 
         //Finalizes configurations for player entity
         allEntities.Add(playerEntity);
         playerEntity.Init(this, controllScene);
         this.AddChild(playerEntity);
 
-
+        return playerEntity;
     }
 
 
-    public override void _Ready()
-    {
-        
-        /*
-         * TODO : ADD MULTIPLAYER IN THIS ELSE STATEMENT
-         * 
-        if (!waitForOtherPlayers && !waitForLocalPlayer)
-            SpawnAllEntities();
-        else
-            //somthing something : Connect, somthing something : "SpawnAllEntities"
-        */
-    }
-
-    protected void SpawnAllEntities()
-    {
-        for (int i = allEntities.Count; i < 12; i++)
-        {
-            Spawn(allEntities[i]);
-        }
-    }
-
-    //ENTITY RELATED METHODS
-    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     public void MoveEntity(Entity entity,Vector2 newTile)
     {
         //Checks if tile is walkable
@@ -133,7 +177,9 @@ public class Level : TileMap
         }
         else
         {
-            //retry if tile is not a floor
+            GD.Print("couldnt fit ");
+            GD.Print(entity);
+            GD.Print("Retrying");
             Spawn(entity);
         }
         

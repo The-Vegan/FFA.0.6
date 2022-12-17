@@ -24,13 +24,16 @@ public class Kyomira1 : Level
         spawnpoints[10] = new Vector2(12, 29);
         spawnpoints[11] = new Vector2(23, 29);
 
-        base._Ready();//When debug is over, this will spawn all entities 
+        
 
         //DEBUG (REMOVE LATER)
         //______________________________________
         SpawnAllEntities();
         //______________________________________
         //DEBUG (REMOVE LATER)
+
+        base._Ready();//When debug is over, this will spawn all entities 
+        // -/!\ NEEDS TO BE CALLED AFTER SpawnAllEntities
     }
 
 }

@@ -1,28 +1,27 @@
 extends Button
 
-var mainMenu
+onready var mainMenu = get_parent().get_parent()
 var destination : int
 
 signal gamemode
 
+const BACK = -1
 const MAINMENU = 0
 const SOLO = 1
 const CHARACTERSELECT = 2
 const LEVELSELECT = 3
 
 var mode = 0
-var character = 0
-
 
 func _ready():
-	mainMenu = get_parent().get_parent()
 	$AnimatedSprite.play("Normal")
 	connect("gamemode",mainMenu,"SetGame")
 
 #YOU NEED TO OVERRIDE THE DESINATION IN THE READY OVERRIDE
 func _pressed():
 	mainMenu.MoveCameraTo(destination)
-	emit_signal("gamemode",mode,character)
+	if (mode != 0):
+		emit_signal("gamemode",mode)
 
 func _notification(what):
 	match(what):

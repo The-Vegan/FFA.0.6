@@ -16,7 +16,7 @@ public class Entity : AnimatedSprite
     protected AnimationPlayer animPlayer;
 
     [Signal]
-    delegate void entityIsDone();
+    protected delegate void entityIsDone();
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDENCIES
 
@@ -53,7 +53,7 @@ public class Entity : AnimatedSprite
 
     //ANIMATION
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    bool damaged = false;
+    protected bool damaged = false;
     protected String direction = "Down";
     protected String action;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -235,7 +235,7 @@ public class Entity : AnimatedSprite
             healthPoint -= damage;
             damaged = true;
 
-            source.HitSomeone(this,(short)(damage << 2 + 5));
+            source.HitSomeone(this,(short)((damage << 2) + 5));
 
             await ToSignal(this, "animation_finished");
             if(healthPoint <= 0)

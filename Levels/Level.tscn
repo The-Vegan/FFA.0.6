@@ -74,4 +74,7 @@ format = 1
 wait_time = 0.667
 autostart = true
 
+[node name="Camera2D" type="Camera2D" parent="."]
+smoothing_enabled = true
+
 [connection signal="timeout" from="Timer" to="." method="TimerUpdate"]

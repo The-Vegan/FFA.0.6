@@ -1,4 +1,4 @@
-extends "res://UIAndMenus/LevelLoader.gd"
+extends "res://UIAndMenus/LevelButtons/LevelLoader.gd"
 
 
 

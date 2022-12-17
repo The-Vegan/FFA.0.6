@@ -6,7 +6,6 @@ public class DamageTile : AnimatedSprite
     private Entity source;
     private Vector2 coordinates;
     private String animation;
-    private SpriteFrames texture;
 
     private bool flippedH = false, flippedV = false;
     private short damage;

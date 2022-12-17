@@ -4,13 +4,13 @@ extends Control
 var camera : Camera2D
 
 var gameMode: int
-var playerCharacter: int
+var playerCharacter : int = 0
 var team : int = 0
 var numberOfPlayer : int = 1
 var waitForMultiplayer : bool = false
 
 #Camera positions for menus
-var back :int = 0
+var back :Array = [Vector2(0,0)]
 const MAINMENU = Vector2(0,0)
 const SOLO = Vector2(0,-576)
 const CHARSELECT = Vector2(-1024,0)
@@ -25,15 +25,16 @@ func _ready():
 
 func MoveCameraTo(var destination : int):
 	
-	match(camera.position):#Tells where to go if back is pressed
-		SOLO:
-			back = 1
-		CHARSELECT:
-			back = 2
-		_:#default goes back to mainMenu /!\ DANGEROUS
-			back = 0
+	if (destination == -1):#Back
+		
+		camera.position = back.pop_back()
+		
+		if (back.size() == 0):
+			back.push_back(MAINMENU)
+		
+		return
 	
-	
+	back.push_back(camera.position)
 	
 	match(destination):
 		0:#main menu
@@ -42,14 +43,14 @@ func MoveCameraTo(var destination : int):
 			camera.position = SOLO
 		2:#character selection
 			camera.position = CHARSELECT
+			
 		3:#level selection
 			camera.position = LEVELSELECT
-		_:#default
-			camera.position = MAINMENU
-		
-	
 
-func SetGame(mode : int, character : int):
+
+
+
+func SetGame(mode : int):
 	
 	match(mode):
 		0:#None
@@ -60,15 +61,23 @@ func SetGame(mode : int, character : int):
 			print("CTF")
 		3:#Campaign
 			print("Campaign")
-		
-	match(character):
-		1:
-			print("Pirate")
-		2:
-			print("Blahaj")
 	
+	if(mode != 0):
+		gameMode = mode
 	
 	pass
+
+func setCharacter(character : int):
+	
+	match(character):
+		0:#None
+			print("None")
+		1:#Pirate
+			print("Pirate")
+		2:#Blahaj
+			print("Blahaj")
+	pass
+
 
 func DisplayErr():
 	var tween = $Error/Tween
