@@ -9,6 +9,8 @@ public class Level : TileMap
     protected short globalBeat = 0;
     protected Random rand = new Random();
     protected Vector2[] spawnpoints = new Vector2[12];
+
+    protected Timer timer;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //Level Variable
 
@@ -23,19 +25,25 @@ public class Level : TileMap
     protected List<Entity> allEntities = new List<Entity>();
 
     [Signal]
-    protected delegate void allEntitiesAreDone();
+    protected delegate void allEntitiesAreDone();//Depreciated
 
     [Signal]
     protected delegate void loadComplete(bool success);
 
-    protected byte doneEntities = 0;
+    [Signal]
+    protected delegate void checkEndingCondition();
 
-    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    //DEPENDANCIES
+    protected byte doneEntities = 0;//Depreciated
+
     protected PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
     protected PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
 
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //DEPENDANCIES
 
+
+    //INIT METHODS
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     public void InitPlayerAndMode(int chosenCharacter, int gameMode, int chosenTeam, bool waitForMultiPlayer)
     {
         //waitForOtherPlayer can also be set to false if the distant players are ready before the local player
@@ -49,17 +57,19 @@ public class Level : TileMap
              2: CTF
              3: Sacking
              */
+            
             case 0:
-
+            default://fail-safe
+                this.Connect("checkEndingCondition", this, "ClassicEndCond");
                 break;
             case 1:
-
+                this.Connect("checkEndingCondition", this, "TeamEndCond");
                 break;
             case 2:
-
+                this.Connect("checkEndingCondition", this, "CTFEndCond");//CTF NOT CODED
                 break;
             case 3:
-
+                this.Connect("checkEndingCondition", this, "SackingEndCond");//SACKING NOT CODED
                 break;
         }
         PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
@@ -96,7 +106,7 @@ public class Level : TileMap
     public override void _Ready()
     {
         camera = this.GetNode("Camera2D") as Camera2D;
-
+        timer = this.GetNode("Timer") as Timer;
         this.RemoveChild(camera);
 
         mainPlayer.AddChild(camera);
@@ -118,6 +128,8 @@ public class Level : TileMap
         }
 
     }
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //INIT METHODS
 
     //ENTITY RELATED METHODS
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -206,6 +218,24 @@ public class Level : TileMap
 
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ATTACK RELATED METHODS
+
+    //ENDING CONDITION
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+
+    protected void ClosingArena()
+    {
+        
+    }
+
+    protected void ClassicEndCond()
+    {
+        if(globalBeat > 200)
+        {
+            ClosingArena();
+        }
+    }
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //ENDING CONDITION
     public async void TimerUpdate()
     {
         GD.Print("[Level] - - - - - - - - - - - - - - - - - - - - - - - -");
@@ -216,6 +246,9 @@ public class Level : TileMap
         await ToSignal(this, "allEntitiesAreDone");
         GD.Print("[Level] After allEntitiesAreDone");
         GetTree().CallGroup("Attacks", "BeatAtkUpdate");
+
+
+        EmitSignal("checkEndingCondition");
     }
 
 }
