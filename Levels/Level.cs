@@ -25,15 +25,10 @@ public class Level : TileMap
     protected List<Entity> allEntities = new List<Entity>();
 
     [Signal]
-    protected delegate void allEntitiesAreDone();//Depreciated
-
-    [Signal]
     protected delegate void loadComplete(bool success);
 
     [Signal]
     protected delegate void checkEndingCondition();
-
-    protected byte doneEntities = 0;//Depreciated
 
     protected PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
     protected PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
@@ -57,19 +52,22 @@ public class Level : TileMap
              2: CTF
              3: Sacking
              */
-            
             case 0:
             default://fail-safe
                 this.Connect("checkEndingCondition", this, "ClassicEndCond");
+                GD.Print("[Level] Classic");
                 break;
             case 1:
                 this.Connect("checkEndingCondition", this, "TeamEndCond");
+                GD.Print("[Level] Team");
                 break;
             case 2:
                 this.Connect("checkEndingCondition", this, "CTFEndCond");//CTF NOT CODED
+                GD.Print("[Level] CTF");
                 break;
             case 3:
                 this.Connect("checkEndingCondition", this, "SackingEndCond");//SACKING NOT CODED
+                GD.Print("[Level] Sacking");
                 break;
         }
         PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
@@ -112,6 +110,11 @@ public class Level : TileMap
         mainPlayer.AddChild(camera);
 
         camera.Current = true;
+    }
+
+    public float GetTime()
+    {
+        return timer.TimeLeft;
     }
 
     protected void SpawnAllEntities()
@@ -197,12 +200,6 @@ public class Level : TileMap
         
 
     }
-
-    protected void EntityDone()//Signal method : is triggered when an entity has finished it's BeatUpdate coroutine
-    {
-        doneEntities++;
-        if (doneEntities >= allEntities.Count) EmitSignal("allEntitiesAreDone");
-    }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ENTITY RELATED METHODS
 
@@ -224,31 +221,66 @@ public class Level : TileMap
 
     protected void ClosingArena()
     {
-        
+        GD.Print("[Level]CLOSING");
     }
 
     protected void ClassicEndCond()
     {
-        if(globalBeat > 200)
+        if(globalBeat > 20)
         {
             ClosingArena();
         }
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ENDING CONDITION
-    public async void TimerUpdate()
+    public void TimerUpdate()
     {
         GD.Print("[Level] - - - - - - - - - - - - - - - - - - - - - - - -");
         globalBeat++;
-        
-        GetTree().CallGroup("Entities", "BeatUpdate");
-        GD.Print("[Level] Before allEntitiesAreDone");
-        await ToSignal(this, "allEntitiesAreDone");
-        GD.Print("[Level] After allEntitiesAreDone");
+
+        UpdateAllEntities();
+
         GetTree().CallGroup("Attacks", "BeatAtkUpdate");
 
-
         EmitSignal("checkEndingCondition");
+    }
+
+    protected void UpdateAllEntities()
+    {
+        SortAllEntities();
+
+        for(int i = 0;i < allEntities.Count; i++)
+        {
+            allEntities[i].BeatUpdate();
+        }
+    }
+
+    protected void SortAllEntities()//CombSort
+    {
+        int gap = allEntities.Count >> 1;
+
+        while(gap != 0)
+        {
+            Entity tempEntity;
+
+            for(int i = 0;i < allEntities.Count - gap; i++)
+            {
+                
+                if(Math.Abs(allEntities[i].timing - (1f / 6f)) > Math.Abs( allEntities[i + gap].timing - (1f / 6f)))//If entity in front has bigger score(worse)
+                {
+                    //Swap
+                    tempEntity = allEntities[i];
+                    allEntities[i] = allEntities[i + gap];
+                    allEntities[i + gap] = tempEntity;
+
+                }
+            }
+
+            gap--;
+
+        }
+
+
     }
 
 }

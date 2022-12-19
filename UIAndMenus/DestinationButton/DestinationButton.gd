@@ -11,7 +11,7 @@ const SOLO = 1
 const CHARACTERSELECT = 2
 const LEVELSELECT = 3
 
-var mode = 0
+var mode = -1
 
 func _ready():
 	$AnimatedSprite.play("Normal")

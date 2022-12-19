@@ -13,6 +13,7 @@ public class Pirate : Entity
     private List<List<Dictionary<String, short>>> RIGHTMOVEATK = new List<List<Dictionary<string, short>>>();
     private List<List<Dictionary<String, short>>> UPMOVEATK = new List<List<Dictionary<string, short>>>();
 
+    protected bool reallyMoved = false;
     public override void _Ready()
     {
         base._Ready();
@@ -168,6 +169,23 @@ public class Pirate : Entity
         }
 
         return base.PacketParser(packetToParse);
+    }
+
+
+
+    
+
+    public override void Moved(Vector2 newTile)
+    {
+        if (pos == newTile)
+        {
+            reallyMoved = false;
+            return;
+        }
+        else
+            reallyMoved = true;
+
+        base.Moved(newTile);
     }
 
     protected override void AskAtk()

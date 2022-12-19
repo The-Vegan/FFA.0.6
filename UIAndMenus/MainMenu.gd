@@ -54,15 +54,15 @@ func SetGame(mode : int):
 	
 	match(mode):
 		0:#None
-			print("None")
-		1:#Classic
 			print("Classic")
+		1:#Classic
+			print("Team")
 		2:#CTF
 			print("CTF")
 		3:#Campaign
 			print("Campaign")
 	
-	if(mode != 0):
+	if(mode != -1):
 		gameMode = mode
 	
 	pass

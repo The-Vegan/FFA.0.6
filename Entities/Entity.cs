@@ -1,12 +1,9 @@
 ﻿using Godot;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 public class Entity : AnimatedSprite
 {
-
-
     //DEPENDENCIES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected PackedScene controllerScene;
@@ -14,21 +11,20 @@ public class Entity : AnimatedSprite
     protected Level map;
     protected Tween tween;
     protected AnimationPlayer animPlayer;
-
-    [Signal]
-    protected delegate void entityIsDone();
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDENCIES
 
     //MOVEMENT RELATED
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    public float timing = -1;
+
     protected short packet;
     public Vector2 pos = new Vector2(-1,-1);
     public Vector2 prevPos;
 
     protected byte stun = 0, cooldown = 3;
     
-    protected bool reallyMoved = false;
+    
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
 
@@ -67,7 +63,7 @@ public class Entity : AnimatedSprite
         map = level;
         controllerScene = c;
 
-        this.Connect("entityIsDone", map, "EntityDone");
+        
         
     }
     public override void _Ready()
@@ -83,6 +79,13 @@ public class Entity : AnimatedSprite
     public void SetPacket(short p)
     {
         this.packet |= p;
+        float currTime = map.GetTime();
+        if (timing < currTime)
+        {
+            timing = currTime;
+        }
+
+
     }
 
     protected virtual short PacketParser(short packetToParse)
@@ -138,17 +141,9 @@ public class Entity : AnimatedSprite
         else if ((packet & 0b1000_0000) != 0) map.CreateAtk(this, UPATK, atkFolder + "UpAtk", animPerBeat, flippableAnim);
     }
 
-    public void Moved(Vector2 newTile)
+    public virtual void Moved(Vector2 newTile)
     {
-        if (pos == newTile)
-        {
-            SetRealyMoved(false);
-            return;
-        }
-            
-            
-        else
-            SetRealyMoved(true);
+        if (pos == newTile) return;
 
 
         map.SetCell((int)pos.x, (int)pos.y, 0);
@@ -162,12 +157,6 @@ public class Entity : AnimatedSprite
             Tween.TransitionType.Sine, Tween.EaseType.Out);                  //Tween says Trans rights
         tween.Start();
         animPlayer.Play("Move");
-        
-
-    }
-    protected void SetRealyMoved(bool didItTho)
-    {
-        reallyMoved = didItTho;
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //GESTION DES MOUVEMENTS
@@ -249,7 +238,7 @@ public class Entity : AnimatedSprite
 
     protected void Death()
     {
-
+        GD.Print("[Entity] Death Called");
 
     }
 
@@ -263,24 +252,21 @@ public class Entity : AnimatedSprite
     
 
 
-    protected void BeatUpdate()
+    public void BeatUpdate()
     {
         if (stun != 0)
         {
-            EmitSignal("entityIsDone");
             cooldown = 0;
             stun--;
             return;
         }
         if (cooldown != 0)
         {
-            EmitSignal("entityIsDone");
             cooldown--;
             return;
         }
         if(packet == 0)
         {
-            EmitSignal("entityIsDone");
             this.Play("FailedInput");
             action = "Idle";
             MidBeatAnimManager();
@@ -297,7 +283,7 @@ public class Entity : AnimatedSprite
 
         //VALUES RESETS
         //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<
-        EmitSignal("entityIsDone");
+        timing = -1;
         packet = 0;
         //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<
         //VALUES RESETS
