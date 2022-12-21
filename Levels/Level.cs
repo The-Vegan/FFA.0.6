@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-public class Level : TileMap
+public abstract class Level : TileMap
 {
     //Level Variable
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -10,7 +10,11 @@ public class Level : TileMap
     protected Random rand = new Random();
     protected Vector2[] spawnpoints = new Vector2[12];
 
+    protected List<Vector2[]> TeamSpawnPoints = new List<Vector2[]>();
+
     protected Timer timer;
+
+    protected bool teamMode = false;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //Level Variable
 
@@ -39,7 +43,7 @@ public class Level : TileMap
 
     //INIT METHODS
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    public void InitPlayerAndMode(int chosenCharacter, int gameMode, int chosenTeam, bool waitForMultiPlayer)
+    public void InitPlayerAndMode(int chosenCharacter, int gameMode,byte numberOfTeams, int chosenTeam, bool waitForMultiPlayer)
     {
         //waitForOtherPlayer can also be set to false if the distant players are ready before the local player
         if (!waitForMultiPlayer) waitForOtherPlayers = false;
@@ -50,24 +54,32 @@ public class Level : TileMap
              0: Classic
              1: Team
              2: CTF
-             3: Sacking
+             3: Siege
              */
             case 0:
             default://fail-safe
                 this.Connect("checkEndingCondition", this, "ClassicEndCond");
+                teamMode = false;
+                InitSpawnPointsClasssic();
                 GD.Print("[Level] Classic");
                 break;
             case 1:
                 this.Connect("checkEndingCondition", this, "TeamEndCond");
+                teamMode = true;
+                InitSpawnPointsTeam(numberOfTeams);
                 GD.Print("[Level] Team");
                 break;
             case 2:
                 this.Connect("checkEndingCondition", this, "CTFEndCond");//CTF NOT CODED
+                teamMode = true;
+                InitSpawnPointsCTF(numberOfTeams);
                 GD.Print("[Level] CTF");
                 break;
             case 3:
-                this.Connect("checkEndingCondition", this, "SackingEndCond");//SACKING NOT CODED
-                GD.Print("[Level] Sacking");
+                this.Connect("checkEndingCondition", this, "SiegeEndCond");//SACKING NOT CODED
+                teamMode = true;
+                InitSpawnPointsSiege();
+                GD.Print("[Level] Siege");
                 break;
         }
         PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
@@ -79,7 +91,12 @@ public class Level : TileMap
         GD.Print("LoadCompleted in level");
 
     }
-
+    //OVERRIDE
+    protected abstract void InitSpawnPointsClasssic();
+    protected abstract void InitSpawnPointsTeam(byte nbrOfTeams);
+    protected abstract void InitSpawnPointsCTF(byte nbrOfTeams);
+    protected abstract void InitSpawnPointsSiege();
+    //OVERRIDE
     public void InitDistantPlayer(List<int> otherPlayers)
     {
         if(otherPlayers.Count > 10)
@@ -183,22 +200,37 @@ public class Level : TileMap
 
     public void Spawn(Entity entity)
     {
-        int randomTile = rand.Next(spawnpoints.Length);
+        byte failures = 0;//Forces spawning if fails too much
 
-        if(this.GetCell((int)spawnpoints[randomTile].x, (int)spawnpoints[randomTile].y) == 0)
+        entity.ResetHealth();
+
+        while (failures < 65)
         {
-            entity.Moved(spawnpoints[randomTile]);
-            entity.Visible = true;
-        }
-        else
-        {
-            GD.Print("couldnt fit ");
-            GD.Print(entity);
-            GD.Print("Retrying");
-            Spawn(entity);
+            if (!teamMode)
+            {
+                int randomTile = rand.Next(spawnpoints.Length);
+
+                if ((this.GetCell((int)spawnpoints[randomTile].x, (int)spawnpoints[randomTile].y) == 0) && (failures < 64))//If tile isn't occupied
+                {
+                    entity.Moved(spawnpoints[randomTile]);
+                    entity.Visible = true;
+                    break;
+                }
+            }
+            else //if (teamMode)
+            {
+                int randomTile = rand.Next(TeamSpawnPoints[entity.team].Length);
+
+                if ((this.GetCell((int)TeamSpawnPoints[entity.team][randomTile].x, (int)TeamSpawnPoints[entity.team][randomTile].y) == 0) && (failures < 64))
+                {
+                    entity.Moved(TeamSpawnPoints[entity.team][randomTile]);
+                    entity.Visible = true;
+                    break;
+                }
+            }
+            failures++;
         }
         
-
     }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ENTITY RELATED METHODS

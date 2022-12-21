@@ -9,6 +9,7 @@ public class Blahaj : Entity
     {
         base._Ready();
 
+        this.maxHP = 175;
 
         this.flippableAnim = true;
         this.atkFolder = "res://Entities/Blahaj/atk/";

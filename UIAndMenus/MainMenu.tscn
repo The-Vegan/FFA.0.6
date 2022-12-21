@@ -1,4 +1,4 @@
-[gd_scene load_steps=134 format=2]
+[gd_scene load_steps=136 format=2]
 
 [ext_resource path="res://UIAndMenus/Button Theme/FullButtonAnim.png" type="Texture" id=1]
 [ext_resource path="res://UIAndMenus/DestinationButton/Back.gd" type="Script" id=2]
@@ -12,6 +12,8 @@
 [ext_resource path="res://Levels/Kyomira1.tscn" type="PackedScene" id=10]
 [ext_resource path="res://UIAndMenus/LevelButtons/Level1.gd" type="Script" id=11]
 [ext_resource path="res://UIAndMenus/DestinationButton/ChoseALevel.gd" type="Script" id=12]
+[ext_resource path="res://UIAndMenus/Button Theme/ButtonFont.tres" type="DynamicFont" id=13]
+[ext_resource path="res://UIAndMenus/Button Theme/ButtonTheme.tres" type="Theme" id=14]
 
 [sub_resource type="AtlasTexture" id=50]
 atlas = ExtResource( 1 )
@@ -535,9 +537,12 @@ margin_bottom = 40.0
 margin_top = 32.0
 margin_right = 256.0
 margin_bottom = 160.0
+theme = ExtResource( 14 )
+text = "Solo "
 script = ExtResource( 3 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="StartMenu/Solo"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -551,9 +556,13 @@ margin_right = 1024.0
 margin_top = 100.0
 margin_right = 256.0
 margin_bottom = 228.0
+theme = ExtResource( 14 )
+custom_fonts/font = ExtResource( 13 )
+text = "Classic "
 script = ExtResource( 5 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Classic"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -562,9 +571,12 @@ centered = false
 margin_top = 256.0
 margin_right = 256.0
 margin_bottom = 384.0
+theme = ExtResource( 14 )
+text = "CTF "
 script = ExtResource( 6 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/CTF"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -573,9 +585,12 @@ centered = false
 margin_top = 416.0
 margin_right = 256.0
 margin_bottom = 544.0
+theme = ExtResource( 14 )
+text = "Sacking "
 script = ExtResource( 7 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Campaign"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -585,9 +600,12 @@ margin_left = 768.0
 margin_top = 448.0
 margin_right = 1024.0
 margin_bottom = 576.0
+theme = ExtResource( 14 )
+text = "Back "
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Back"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -614,9 +632,12 @@ margin_left = 768.0
 margin_top = 448.0
 margin_right = 1024.0
 margin_bottom = 576.0
+theme = ExtResource( 14 )
+text = "Back "
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="CharacterSelect/Back"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -625,9 +646,12 @@ centered = false
 margin_top = 448.0
 margin_right = 256.0
 margin_bottom = 576.0
+theme = ExtResource( 14 )
+text = "Next "
 script = ExtResource( 12 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="CharacterSelect/ChoseALevel"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false
@@ -655,9 +679,12 @@ margin_left = 768.0
 margin_top = 448.0
 margin_right = 1024.0
 margin_bottom = 576.0
+theme = ExtResource( 14 )
+text = "Back "
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="LevelSelect/Back"]
+z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
 centered = false

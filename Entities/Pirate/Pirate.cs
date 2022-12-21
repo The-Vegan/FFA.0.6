@@ -19,7 +19,10 @@ public class Pirate : Entity
         base._Ready();
 
         this.atkFolder = "res://Entities/Pirate/atk/";
+
+        this.maxHP = 125;
         
+
 
         this.animPerBeat = new byte[] {5};
         {//Declare downAtkTiles

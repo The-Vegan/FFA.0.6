@@ -11,6 +11,8 @@ public class Entity : AnimatedSprite
     protected Level map;
     protected Tween tween;
     protected AnimationPlayer animPlayer;
+
+    public byte team = 0;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDENCIES
 
@@ -22,17 +24,20 @@ public class Entity : AnimatedSprite
     public Vector2 pos = new Vector2(-1,-1);
     public Vector2 prevPos;
 
-    protected byte stun = 0, cooldown = 3;
-    
-    
+    protected byte stun = 0, cooldown = 3, respawnCooldown = 0;
+    protected bool isDead = false;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
 
     //ATTACK VARIABLES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-
     protected short healthPoint;
     protected short maxHP;
+
+    protected bool isValidTarget = true;//Clones and stuff don't give you points for hitting them
+
+    protected short blunderBar = 0;
+    protected short itemBar = 0;
 
     protected List<Entity> damagedBy;
 
@@ -224,7 +229,10 @@ public class Entity : AnimatedSprite
             healthPoint -= damage;
             damaged = true;
 
-            source.HitSomeone(this,(short)((damage << 2) + 5));
+            if (isValidTarget)
+            {
+                source.HitSomeone((short)((damage << 2) + 5));
+            }
 
             await ToSignal(this, "animation_finished");
             if(healthPoint <= 0)
@@ -238,15 +246,36 @@ public class Entity : AnimatedSprite
 
     protected void Death()
     {
-        GD.Print("[Entity] Death Called");
 
+        for(int i = 1;i < damagedBy.Count; i++)
+        {
+            damagedBy[i].HitSomeone((short) (50/(damagedBy.Count - 1)));//Distributes 50 points between all killers
+        }
+
+        prevPos = Vector2.NegOne;//Prevents further damage
+        pos = Vector2.NegOne;
+        this.Visible = false;
+
+        isDead = true;
+
+        respawnCooldown = 6;
     }
 
 
-    public void HitSomeone(Entity target,short points) 
+    public void HitSomeone(short points) 
     {
-    
+        this.itemBar += points;
+        this.blunderBar -= (short)(points >> 2);
+
+        if (itemBar > 100) itemBar = 100;
+        if (blunderBar < 0) blunderBar = 0;
     }
+
+    public void ResetHealth()
+    {
+        healthPoint = maxHP;
+    }
+
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //GESTION DES DEGATS
     
@@ -254,6 +283,15 @@ public class Entity : AnimatedSprite
 
     public void BeatUpdate()
     {
+        if (isDead)
+        {
+            respawnCooldown--;
+            if(respawnCooldown <= 0)
+            {
+                map.Spawn(this);
+                GD.Print("Respawned at : " + pos);
+            }
+        }
         if (stun != 0)
         {
             cooldown = 0;
