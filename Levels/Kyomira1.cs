@@ -38,7 +38,7 @@ public class Kyomira1 : Level
         spawnpoints[11] = new Vector2(23, 29);
     }
 
-    protected override void InitSpawnPointsCTF(byte nbrOfTeams)
+    protected override void InitSpawnPointsCTF(int nbrOfTeams)
     {
         switch (nbrOfTeams)
         {
@@ -144,7 +144,7 @@ public class Kyomira1 : Level
         throw new NotImplementedException();
     }
 
-    protected override void InitSpawnPointsTeam(byte nbrOfTeams)
+    protected override void InitSpawnPointsTeam(int nbrOfTeams)
     {
         throw new NotImplementedException();
     }

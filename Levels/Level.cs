@@ -13,10 +13,18 @@ public abstract class Level : TileMap
     protected List<Vector2[]> TeamSpawnPoints = new List<Vector2[]>();
 
     protected Timer timer;
+    protected Camera2D camera;
 
     protected bool teamMode = false;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //Level Variable
+
+    //Entities Variables
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    protected int NumberOfEntities = 1;
+    protected List<Entity> allEntities = new List<Entity>();
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //Entities Variables
 
     //DEPENDANCIES
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -24,10 +32,9 @@ public abstract class Level : TileMap
     protected bool waitForOtherPlayers = true;
 
     protected Entity mainPlayer;
-    protected Camera2D camera;
+    
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
-    protected List<Entity> allEntities = new List<Entity>();
-
+    
     [Signal]
     protected delegate void loadComplete(bool success);
 
@@ -43,8 +50,10 @@ public abstract class Level : TileMap
 
     //INIT METHODS
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    public void InitPlayerAndMode(int chosenCharacter, int gameMode,byte numberOfTeams, int chosenTeam, bool waitForMultiPlayer)
+    public void InitPlayerAndMode(int chosenCharacter, int gameMode,int numberOfPlayers,int numberOfTeams, int chosenTeam, bool waitForMultiPlayer)
     {
+        NumberOfEntities = numberOfPlayers;
+
         //waitForOtherPlayer can also be set to false if the distant players are ready before the local player
         if (!waitForMultiPlayer) waitForOtherPlayers = false;
 
@@ -93,13 +102,13 @@ public abstract class Level : TileMap
     }
     //OVERRIDE
     protected abstract void InitSpawnPointsClasssic();
-    protected abstract void InitSpawnPointsTeam(byte nbrOfTeams);
-    protected abstract void InitSpawnPointsCTF(byte nbrOfTeams);
-    protected abstract void InitSpawnPointsSiege();
+    protected abstract void InitSpawnPointsTeam(int nbrOfTeams);
+    protected abstract void InitSpawnPointsCTF(int nbrOfTeams);
+    protected abstract void InitSpawnPointsSiege();//Always 4 teams
     //OVERRIDE
     public void InitDistantPlayer(List<int> otherPlayers)
     {
-        if(otherPlayers.Count > 10)
+        if(otherPlayers.Count > NumberOfEntities - 2)
         {
             EmitSignal("loadComplete", false);//Failed to load : too many players
         }
@@ -138,7 +147,7 @@ public abstract class Level : TileMap
     {
         //PackedScene cpu = GD.Load("res://Abstract/GenericController.cs") as PackedScene;
         PackedScene cpu = GD.Load("res://Abstract/GenericController.tscn") as PackedScene;
-        for (int i = allEntities.Count; i < 11; i++)
+        for (int i = allEntities.Count; i < NumberOfEntities; i++)
         {
            CreateEntityInstance(cpu);
         }

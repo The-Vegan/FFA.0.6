@@ -60,6 +60,12 @@ public class Entity : AnimatedSprite
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ANIMATION
 
+    //CTF
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    public sbyte heldFlag = -1;
+
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    //CTF
 
     public void Init(Level level,PackedScene c)
     {
