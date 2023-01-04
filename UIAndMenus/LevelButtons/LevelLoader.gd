@@ -18,7 +18,7 @@ func GenerateLevel(character : int , mode : int):
 	
 	loadedLevel.connect("loadComplete",self,"LevelLoaded")
 	
-	loadedLevel.InitPlayerAndMode(character,mode,1,mainMenu.team,mainMenu.waitForMultiplayer)
+	loadedLevel.InitPlayerAndMode(character,mode,12,mainMenu.team,mainMenu.chosenTeam,mainMenu.waitForMultiplayer)
 	
 	
 

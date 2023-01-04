@@ -5,7 +5,8 @@ var camera : Camera2D
 
 var gameMode: int
 var playerCharacter : int = 0
-var team : int = 0
+var team : int = 1
+var chosenTeam :int = 0
 var numberOfPlayer : int = 1
 var waitForMultiplayer : bool = false
 

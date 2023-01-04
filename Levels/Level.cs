@@ -262,12 +262,12 @@ public abstract class Level : TileMap
 
     protected void ClosingArena()
     {
-        GD.Print("[Level]CLOSING");
+        GD.Print("[Level]CLOSING ARENA");
     }
 
     protected void ClassicEndCond()
     {
-        if(globalBeat > 20)
+        if(globalBeat > 200)
         {
             ClosingArena();
         }
