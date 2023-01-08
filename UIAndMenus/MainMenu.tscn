@@ -581,15 +581,15 @@ frames = SubResource( 170 )
 animation = "Normal"
 centered = false
 
-[node name="Campaign" type="Button" parent="SoloMenu"]
+[node name="Siege" type="Button" parent="SoloMenu"]
 margin_top = 416.0
 margin_right = 256.0
 margin_bottom = 544.0
 theme = ExtResource( 14 )
-text = "Sacking "
+text = "Siege "
 script = ExtResource( 7 )
 
-[node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Campaign"]
+[node name="AnimatedSprite" type="AnimatedSprite" parent="SoloMenu/Siege"]
 z_index = -1
 frames = SubResource( 170 )
 animation = "Normal"
