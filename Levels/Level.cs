@@ -265,7 +265,7 @@ public abstract class Level : TileMap
         GD.Print("[Level]CLOSING ARENA");
     }
 
-    protected void ClassicEndCond()
+    protected virtual void ClassicEndCond()
     {
         if(globalBeat > 200)
         {
