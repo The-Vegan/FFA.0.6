@@ -23,6 +23,7 @@ public abstract class Level : TileMap
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected int NumberOfEntities = 1;
     protected List<Entity> allEntities = new List<Entity>();
+    protected Dictionary<Vector2, Entity> coordToEntity = new Dictionary<Vector2, Entity>();
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //Entities Variables
 
@@ -207,7 +208,7 @@ public abstract class Level : TileMap
         }
     }
 
-    public void Spawn(Entity entity)
+    public async void Spawn(Entity entity)
     {
         byte failures = 0;//Forces spawning if fails too much
 
@@ -222,6 +223,7 @@ public abstract class Level : TileMap
                 if ((this.GetCell((int)spawnpoints[randomTile].x, (int)spawnpoints[randomTile].y) == 0) && (failures < 64))//If tile isn't occupied
                 {
                     entity.Moved(spawnpoints[randomTile]);
+                    await ToSignal(entity.GetNode("Tween"), "tween_completed");
                     entity.Visible = true;
                     break;
                 }
@@ -253,6 +255,26 @@ public abstract class Level : TileMap
         this.AddChild(atkInstance);
     }
 
+    public void DamageEntity(Attack atk)
+    {
+        int damageTiles = atk.GetChildCount();
+        for(int i = 0; i < damageTiles; i++)//Goes through all the damagetiles in the Attack
+        {
+            DamageTile dt = atk.GetChild<DamageTile>(i);
+
+            if (dt.GetDamage() <= 0) continue;
+            try
+            {
+                coordToEntity[dt.GetCoords()].Damaged(atk.GetSource(),dt.GetDamage());//Finds entity on tile and damages it
+                GD.Print("[Level] " + coordToEntity[dt.GetCoords()] + " is on damageTile");
+            }
+            catch (KeyNotFoundException)//No entities on that tile
+            {
+                GD.Print("[Level] no entities on " + dt.GetCoords());
+                continue;
+            }
+        }
+    }
 
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ATTACK RELATED METHODS
@@ -280,6 +302,8 @@ public abstract class Level : TileMap
         globalBeat++;
 
         UpdateAllEntities();
+
+        UpdatePositionDictionary();
 
         GetTree().CallGroup("Attacks", "BeatAtkUpdate");
 
@@ -320,8 +344,30 @@ public abstract class Level : TileMap
             gap--;
 
         }
+    }
 
+    private void UpdatePositionDictionary()
+    {
+        coordToEntity = new Dictionary<Vector2, Entity>();
+        
+        for (int i= 0; i < allEntities.Count; i++)
+        {
 
+            try
+            {
+                coordToEntity.Add(allEntities[i].pos, allEntities[i]);//Adds the position of the entity as it's key
+                if (!allEntities[i].pos.IsEqualApprox(allEntities[i].prevPos))
+                    coordToEntity.Add(allEntities[i].prevPos, allEntities[i]);
+            }
+            catch (ArgumentException)
+            {
+                
+                
+
+                continue;
+            }
+            
+        }
     }
 
 }

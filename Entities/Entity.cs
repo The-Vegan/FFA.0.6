@@ -203,14 +203,6 @@ public class Entity : AnimatedSprite
 
     }
 
-    private void OnBeatAnimManager()
-    {
-
-
-
-
-    }
-
     private void DirectionSetter()
     {
         if      ((packet & 0b0001) != 0) direction = "Down";
@@ -229,6 +221,8 @@ public class Entity : AnimatedSprite
 
     public async void Damaged (Entity source,short damage)
     {
+        //If damage is 0, this will not be called
+        GD.Print("[Entity]" + this +" Damaged by " + source);
         if (!damagedBy.Contains(source))
         {
             damagedBy.Add(source);
@@ -252,11 +246,13 @@ public class Entity : AnimatedSprite
 
     protected void Death()
     {
-
+        GD.Print("[Entity] Death Called");
         for(int i = 1;i < damagedBy.Count; i++)
         {
             damagedBy[i].HitSomeone((short) (50/(damagedBy.Count - 1)));//Distributes 50 points between all killers
         }
+
+        map.SetCell((int)pos.x, (int)pos.y, 0);//Makes tile walkable again
 
         prevPos = Vector2.NegOne;//Prevents further damage
         pos = Vector2.NegOne;
@@ -289,6 +285,9 @@ public class Entity : AnimatedSprite
 
     public void BeatUpdate()
     {
+        prevPos = pos;
+        damagedBy = new List<Entity>() { this };
+
         if (isDead)
         {
             respawnCooldown--;

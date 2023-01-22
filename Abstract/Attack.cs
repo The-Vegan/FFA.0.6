@@ -25,6 +25,8 @@ public class Attack : Node2D
     protected String beatAnimPath;
 
     protected PackedScene damageTileScene = GD.Load("res://Abstract/DamageTile.tscn") as PackedScene;
+
+    public Entity GetSource() { return source; }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDANCIES
 
@@ -96,6 +98,7 @@ public class Attack : Node2D
 
         }
 
+        level.DamageEntity(this);
         
 
     }

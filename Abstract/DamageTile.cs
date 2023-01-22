@@ -10,6 +10,9 @@ public class DamageTile : AnimatedSprite
     private bool flippedH = false, flippedV = false;
     private short damage;
     
+    public short GetDamage(){return damage;}
+    public Vector2 GetCoords(){return coordinates;}
+
 
     public void InitDamageTile(Entity attacker,Vector2 pos,String anim,SpriteFrames sf,short punch,bool flippedX, bool flippedY)
     {
