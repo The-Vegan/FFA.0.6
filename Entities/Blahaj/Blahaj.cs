@@ -272,6 +272,7 @@ public class Blahaj : Entity
     {
         if ((packet & 0b1111_0000) == 0) return;
         action = "Atk";
+        cooldown = ATKCOOLDOWN;
         if ((packet & 0b0001_0000) != 0) map.CreateAtk(this, DOWNATK, atkFolder + "V", animPerBeat, flippableAnim);
         else if ((packet & 0b0010_0000) != 0) map.CreateAtk(this, LEFTATK, atkFolder + "H", animPerBeat, flippableAnim);
         else if ((packet & 0b0100_0000) != 0) map.CreateAtk(this, RIGHTATK, atkFolder + "H", animPerBeat, flippableAnim);

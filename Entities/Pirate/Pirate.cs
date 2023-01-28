@@ -160,7 +160,7 @@ public class Pirate : Entity
 
     protected override short PacketParser(short packetToParse)
     {
-        if ((packetToParse >> 4) == (packetToParse & 0b1111))//move and Attack At the same time
+        if ((packetToParse >> 4) == (packetToParse & 0b1111))//move and Attack At the same time (no rest/items)
         {
             short parsedPacket = 0;
             if ((packetToParse & 0b0001) != 0) parsedPacket = 17;
@@ -195,7 +195,7 @@ public class Pirate : Entity
     {
         if ((packet & 0b1111_0000) == 0) return;
         action = "Atk";
-        
+        cooldown = ATKCOOLDOWN;
         if (((packet >> 4) == (packet & 0b1111)) && (reallyMoved))//if dash-atk
         {
 

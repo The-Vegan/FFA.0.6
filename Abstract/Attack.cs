@@ -138,7 +138,7 @@ public class Attack : Node2D
         //File not found
         if (spriteSheet == null)
         {
-           GD.Print(beatAnimPath);
+           GD.Print("[Attack] Can't find texture : " + beatAnimPath);
             spriteSheet = GD.Load("res://Entities/Default.png") as Texture;
             
         }

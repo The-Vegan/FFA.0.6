@@ -14,6 +14,7 @@ public abstract class Level : TileMap
 
     protected Timer timer;
     protected Camera2D camera;
+    protected PackedScene hudScene = GD.Load<PackedScene>("res://UIAndMenus/HUD/Hud.tscn");
 
     protected bool teamMode = false;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -98,7 +99,7 @@ public abstract class Level : TileMap
 
         
         if (!waitForMultiPlayer) EmitSignal("loadComplete", true);
-        GD.Print("LoadCompleted in level");
+        GD.Print("[Level] LoadCompleted in level");
 
     }
     //OVERRIDE
@@ -133,8 +134,14 @@ public abstract class Level : TileMap
         camera = this.GetNode("Camera2D") as Camera2D;
         timer = this.GetNode("Timer") as Timer;
         this.RemoveChild(camera);
+        
+        Hud hud = hudScene.Instance() as Hud;
+
+        mainPlayer.AddChild(hud);
+        mainPlayer.Connect("noteHiter", hud, "HitNote");
 
         mainPlayer.AddChild(camera);
+        
 
         camera.Current = true;
     }
@@ -266,11 +273,11 @@ public abstract class Level : TileMap
             try
             {
                 coordToEntity[dt.GetCoords()].Damaged(atk.GetSource(),dt.GetDamage());//Finds entity on tile and damages it
-                GD.Print("[Level] " + coordToEntity[dt.GetCoords()] + " is on damageTile");
+                
             }
             catch (KeyNotFoundException)//No entities on that tile
             {
-                GD.Print("[Level] no entities on " + dt.GetCoords());
+                
                 continue;
             }
         }
@@ -356,14 +363,20 @@ public abstract class Level : TileMap
             try
             {
                 coordToEntity.Add(allEntities[i].pos, allEntities[i]);//Adds the position of the entity as it's key
-                if (!allEntities[i].pos.IsEqualApprox(allEntities[i].prevPos))
-                    coordToEntity.Add(allEntities[i].prevPos, allEntities[i]);
+                coordToEntity.Add(allEntities[i].prevPos, allEntities[i]);//If prevPos == pos, The exception will be caught
+                /*NOTE
+                *
+                * If multiple entities spawn on the same tile, this may or may not make them invincible
+                * until they get separeted (IE, one of them moves), the second one will remain intangible for one beat.
+                * After moving however, the tile will be set to walkable and thus make it possible for someone to get
+                * on the entity extanding it's invincibility.
+                * 
+                * This code is writen under the assumption that two entities wont be on the same tile during a normal game
+                * but caution is recommended to avoid theses situations as much as possible.
+                */
             }
-            catch (ArgumentException)
+            catch (Exception)
             {
-                
-                
-
                 continue;
             }
             

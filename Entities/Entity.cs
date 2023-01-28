@@ -18,6 +18,7 @@ public class Entity : AnimatedSprite
 
     //MOVEMENT RELATED
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
+    protected byte ATKCOOLDOWN = 1;
     public float timing = -1;
 
     protected short packet;
@@ -26,6 +27,9 @@ public class Entity : AnimatedSprite
 
     protected byte stun = 0, cooldown = 3, respawnCooldown = 0;
     protected bool isDead = false;
+
+    [Signal]
+    public delegate void noteHiter( bool volontary);
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
 
@@ -87,37 +91,65 @@ public class Entity : AnimatedSprite
 
     //GESTION DES INPUTS
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    public void SetPacket(short p)
+    protected bool atkNoteWereHit = false;
+    public virtual void SetPacket(short p)
     {
+
+        if (cooldown != 0 || stun != 0)return;
+        
+        short comparePacket = packet;
         this.packet |= p;
+        if (packet == comparePacket) return;
+
         float currTime = map.GetTime();
         if (timing < currTime)
         {
             timing = currTime;
-        }
+            GD.Print("[Entity] Timing is : " + (timing - (1f / 6f)));
 
+            if ((packet & 0b1111_0000) != 0)//If it's an attack
+            {
+                atkNoteWereHit = true;
+                for (byte i = 0; i <= ATKCOOLDOWN;i++) EmitSignal("noteHiter", true);//Can't be registered in this context
+            }
+            else
+            {
+                EmitSignal("noteHiter", true);
+            }
+
+            
+        }
+        else if ((packet & 0b1111_0000) != 0 && !atkNoteWereHit)//If delayed input is an attack and is unregistered
+        {
+            atkNoteWereHit = true;
+            for (byte i = 0; i < ATKCOOLDOWN; i++) EmitSignal("noteHiter", true);// < instead of <= to loop one time less
+        }
+        
 
     }
 
     protected virtual short PacketParser(short packetToParse)
     {
-        //Rest
-        if (packetToParse >= 512) return 512;
-
         short parsedPacket = 0;
-        bool item = false;
-        if (packetToParse >= 256) item = true;
 
-        if      ((packetToParse & 0b0000_0001) != 0) parsedPacket = 1;
-        else if ((packetToParse & 0b0000_0010) != 0) parsedPacket = 2;
-        else if ((packetToParse & 0b0000_0100) != 0) parsedPacket = 4;
-        else if ((packetToParse & 0b0000_1000) != 0) parsedPacket = 8;
-        else if ((packetToParse & 0b0001_0000) != 0) parsedPacket = 16;
-        else if ((packetToParse & 0b0010_0000) != 0) parsedPacket = 32;
-        else if ((packetToParse & 0b0100_0000) != 0) parsedPacket = 64;
-        else if ((packetToParse & 0b1000_0000) != 0) parsedPacket = 128;
+        if ((packetToParse & 0b1111_0000) != 0)//Is it an attack
+        {
+            if ((packetToParse & 0b0001_0000) != 0) parsedPacket = 16;
+            else if ((packetToParse & 0b0010_0000) != 0) parsedPacket = 32;
+            else if ((packetToParse & 0b0100_0000) != 0) parsedPacket = 64;
+            else if ((packetToParse & 0b1000_0000) != 0) parsedPacket = 128;
+        }
+        else
+        {
+            if ((packetToParse & 0b10_0000_0000) != 0) return 512;//Is it rest
 
-        if (item)
+            if ((packetToParse & 0b0000_0001) != 0) parsedPacket = 1;       //Is it a movement
+            else if ((packetToParse & 0b0000_0010) != 0) parsedPacket = 2;
+            else if ((packetToParse & 0b0000_0100) != 0) parsedPacket = 4;
+            else if ((packetToParse & 0b0000_1000) != 0) parsedPacket = 8;
+        }
+        
+        if ((packetToParse & 256) != 0) 
         {
             if (parsedPacket >= 16) parsedPacket >>= 4;//offsets attack into move
             parsedPacket |= 256;//enable item flag
@@ -146,6 +178,7 @@ public class Entity : AnimatedSprite
     {
         if ((packet & 0b1111_0000) == 0) return;
         action = "Atk";
+        cooldown = ATKCOOLDOWN;
         if      ((packet & 0b0001_0000) != 0) map.CreateAtk(this, DOWNATK, atkFolder + "DownAtk", animPerBeat, flippableAnim);
         else if ((packet & 0b0010_0000) != 0) map.CreateAtk(this, LEFTATK, atkFolder + "LeftAtk", animPerBeat, flippableAnim);
         else if ((packet & 0b0100_0000) != 0) map.CreateAtk(this, RIGHTATK, atkFolder + "RightAtk", animPerBeat, flippableAnim);
@@ -222,7 +255,6 @@ public class Entity : AnimatedSprite
     public async void Damaged (Entity source,short damage)
     {
         //If damage is 0, this will not be called
-        GD.Print("[Entity]" + this +" Damaged by " + source);
         if (!damagedBy.Contains(source))
         {
             damagedBy.Add(source);
@@ -246,7 +278,6 @@ public class Entity : AnimatedSprite
 
     protected void Death()
     {
-        GD.Print("[Entity] Death Called");
         for(int i = 1;i < damagedBy.Count; i++)
         {
             damagedBy[i].HitSomeone((short) (50/(damagedBy.Count - 1)));//Distributes 50 points between all killers
@@ -286,7 +317,7 @@ public class Entity : AnimatedSprite
     public void BeatUpdate()
     {
         prevPos = pos;
-        damagedBy = new List<Entity>() { this };
+        
 
         if (isDead)
         {
@@ -294,18 +325,19 @@ public class Entity : AnimatedSprite
             if(respawnCooldown <= 0)
             {
                 map.Spawn(this);
-                GD.Print("Respawned at : " + pos);
             }
         }
         if (stun != 0)
         {
             cooldown = 0;
             stun--;
+            ResetBeatValues();
             return;
         }
         if (cooldown != 0)
         {
             cooldown--;
+            ResetBeatValues();
             return;
         }
         if(packet == 0)
@@ -313,6 +345,7 @@ public class Entity : AnimatedSprite
             this.Play("FailedInput");
             action = "Idle";
             MidBeatAnimManager();
+            ResetBeatValues();
             return;
         }
 
@@ -324,12 +357,14 @@ public class Entity : AnimatedSprite
         this.Play(action + direction);
         MidBeatAnimManager();
 
-        //VALUES RESETS
-        //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<
+        ResetBeatValues();
+        
+    }//End of BeatUpdate
+    private void ResetBeatValues()
+    {
         timing = -1;
         packet = 0;
-        //>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<>-<
-        //VALUES RESETS
-    }//End of BeatUpdate
-
+        atkNoteWereHit = false;
+        damagedBy = new List<Entity>() { this };
+    }
 }
