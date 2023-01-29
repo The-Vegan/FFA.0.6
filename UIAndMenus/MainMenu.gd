@@ -54,14 +54,14 @@ func MoveCameraTo(var destination : int):
 func SetGame(mode : int):
 	
 	match(mode):
-		0:#None
+		0:#Classic
 			print("Classic")
-		1:#Classic
+		1:#Team
 			print("Team")
 		2:#CTF
 			print("CTF")
-		3:#Campaign
-			print("Campaign")
+		3:#Siege
+			print("Siege")
 	
 	if(mode != -1):
 		gameMode = mode
@@ -69,10 +69,11 @@ func SetGame(mode : int):
 	pass
 
 func setCharacter(character : int):
+	playerCharacter = character;
 	
 	match(character):
 		0:#None
-			print("None")
+			print("Random")
 		1:#Pirate
 			print("Pirate")
 		2:#Blahaj

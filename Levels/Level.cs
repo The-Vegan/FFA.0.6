@@ -25,6 +25,7 @@ public abstract class Level : TileMap
     protected int NumberOfEntities = 1;
     protected List<Entity> allEntities = new List<Entity>();
     protected Dictionary<Vector2, Entity> coordToEntity = new Dictionary<Vector2, Entity>();
+    protected Dictionary<Vector2, Entity> oldCoordToEntity = new Dictionary<Vector2, Entity>();
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //Entities Variables
 
@@ -273,11 +274,10 @@ public abstract class Level : TileMap
             try
             {
                 coordToEntity[dt.GetCoords()].Damaged(atk.GetSource(),dt.GetDamage());//Finds entity on tile and damages it
-                
+                oldCoordToEntity[dt.GetCoords()].Damaged(atk.GetSource(),dt.GetDamage());
             }
             catch (KeyNotFoundException)//No entities on that tile
             {
-                
                 continue;
             }
         }
@@ -356,6 +356,7 @@ public abstract class Level : TileMap
     private void UpdatePositionDictionary()
     {
         coordToEntity = new Dictionary<Vector2, Entity>();
+        oldCoordToEntity = new Dictionary<Vector2, Entity>();
         
         for (int i= 0; i < allEntities.Count; i++)
         {
@@ -363,22 +364,14 @@ public abstract class Level : TileMap
             try
             {
                 coordToEntity.Add(allEntities[i].pos, allEntities[i]);//Adds the position of the entity as it's key
-                coordToEntity.Add(allEntities[i].prevPos, allEntities[i]);//If prevPos == pos, The exception will be caught
-                /*NOTE
-                *
-                * If multiple entities spawn on the same tile, this may or may not make them invincible
-                * until they get separeted (IE, one of them moves), the second one will remain intangible for one beat.
-                * After moving however, the tile will be set to walkable and thus make it possible for someone to get
-                * on the entity extanding it's invincibility.
-                * 
-                * This code is writen under the assumption that two entities wont be on the same tile during a normal game
-                * but caution is recommended to avoid theses situations as much as possible.
-                */
+                oldCoordToEntity.Add(allEntities[i].prevPos, allEntities[i]);//Separate dictionaries to avoid problems
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                GD.Print("[Level] exception in UpdatePositionDictionary" + e);
                 continue;
             }
+
             
         }
     }
