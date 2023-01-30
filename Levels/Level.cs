@@ -30,10 +30,7 @@ public abstract class Level : TileMap
     //Entities Variables
 
     //DEPENDANCIES
-    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    protected bool waitForLocalPlayer = true;
-    protected bool waitForOtherPlayers = true;
-
+    //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\  
     protected Entity mainPlayer;
     
     protected PackedScene atkScene = GD.Load("res://Abstract/Attack.tscn") as PackedScene;
@@ -46,6 +43,7 @@ public abstract class Level : TileMap
 
     protected PackedScene pirateScene = GD.Load("res://Entities/Pirate/Pirate.tscn") as PackedScene;
     protected PackedScene blahajScene = GD.Load("res://Entities/Blahaj/Blahaj.tscn") as PackedScene;
+    protected PackedScene monstropisScene = GD.Load("res://Entities/Monstropis/Monstropis.tscn") as PackedScene;
 
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDANCIES
@@ -53,12 +51,12 @@ public abstract class Level : TileMap
 
     //INIT METHODS
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
-    public void InitPlayerAndMode(int chosenCharacter, int gameMode,int numberOfPlayers,int numberOfTeams, int chosenTeam, bool waitForMultiPlayer)
+    public void InitPlayerAndMode(int chosenCharacter, int gameMode,int numberOfPlayers,int numberOfTeams, int chosenTeam)
     {
         NumberOfEntities = numberOfPlayers;
 
         //waitForOtherPlayer can also be set to false if the distant players are ready before the local player
-        if (!waitForMultiPlayer) waitForOtherPlayers = false;
+        
 
         switch (gameMode)//TODO : code the modes
         {
@@ -96,11 +94,16 @@ public abstract class Level : TileMap
         }
         PackedScene controllScene = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
 
-        mainPlayer = CreateEntityInstance(chosenCharacter,controllScene);
+        mainPlayer = CreateEntityInstance(chosenCharacter,controllScene);//CreateEntityInstance Adds the entity to the List of all entities
 
-        
-        if (!waitForMultiPlayer) EmitSignal("loadComplete", true);
+        if (numberOfPlayers > 16) throw new ArgumentException();
+        for(byte i = 1; i < numberOfPlayers; i++)
+        {
+            CreateEntityInstance(GD.Load<PackedScene>("res://Abstract/CPUController.tscn"));
+        }
+
         GD.Print("[Level] LoadCompleted in level");
+        EmitSignal("loadComplete", true);
 
     }
     //OVERRIDE
@@ -109,26 +112,6 @@ public abstract class Level : TileMap
     protected abstract void InitSpawnPointsCTF(int nbrOfTeams);
     protected abstract void InitSpawnPointsSiege();//Always 4 teams
     //OVERRIDE
-    public void InitDistantPlayer(List<int> otherPlayers)
-    {
-        if(otherPlayers.Count > NumberOfEntities - 2)
-        {
-            EmitSignal("loadComplete", false);//Failed to load : too many players
-        }
-
-        PackedScene multiControll = GD.Load("res://Abstract/ControllerPlayer.tscn") as PackedScene;
-
-        for(int i = 0; i < otherPlayers.Count; i++)
-        {
-            Spawn(CreateEntityInstance(otherPlayers[i], multiControll));
-        }
-        waitForOtherPlayers = false;
-
-        if (!waitForLocalPlayer)
-        {
-            EmitSignal("loadComplet", true);
-        }
-    }
 
     public override void _Ready()
     {
@@ -173,7 +156,7 @@ public abstract class Level : TileMap
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     protected Entity CreateEntityInstance(PackedScene pcs)
     {
-        return CreateEntityInstance(rand.Next(1,3), pcs);//Creates random entity
+        return CreateEntityInstance(rand.Next(1,4), pcs);//Creates random entity
     }
     protected Entity CreateEntityInstance(int entityID,PackedScene controllScene)
     {
@@ -182,15 +165,20 @@ public abstract class Level : TileMap
         switch (entityID)
         {
             case 1://Pirate
+                GD.Print("[Level] Make a pirate");
                 playerEntity = pirateScene.Instance() as Pirate;       
                 break;
             case 2://♥
+                GD.Print("[Level] Make a ♥");
                 playerEntity = blahajScene.Instance() as Blahaj;
+                break;
+            case 3:
+                GD.Print("[Level] Make a monstropis");
+                playerEntity = monstropisScene.Instance() as Monstropis;
                 break;
 
             default://Random
-                
-                return CreateEntityInstance(rand.Next(1, 3), controllScene);
+                return CreateEntityInstance(rand.Next(1, 4), controllScene);
 
         }//End of characters switch statement
 
@@ -291,7 +279,7 @@ public abstract class Level : TileMap
 
     protected void ClosingArena()
     {
-        GD.Print("[Level]CLOSING ARENA");
+        GD.Print("[Level] Hello World");
     }
 
     protected virtual void ClassicEndCond()
@@ -305,14 +293,14 @@ public abstract class Level : TileMap
     //ENDING CONDITION
     public void TimerUpdate()
     {
-        GD.Print("[Level] - - - - - - - - - - - - - - - - - - - - - - - -");
+        GD.Print("[Level] - - - - - - - - - - - - - - - - - - - - - - - - " + globalBeat);
         globalBeat++;
 
         UpdateAllEntities();
 
         UpdatePositionDictionary();
 
-        GetTree().CallGroup("Attacks", "BeatAtkUpdate");
+        GetTree().CallGroup("Attacks", "BeatAtkUpdate");//Also updates the hud
 
         EmitSignal("checkEndingCondition");
     }
@@ -321,7 +309,7 @@ public abstract class Level : TileMap
     {
         SortAllEntities();
 
-        for(int i = 0;i < allEntities.Count; i++)
+        for (int i = 0;i < allEntities.Count; i++)
         {
             allEntities[i].BeatUpdate();
         }
@@ -344,12 +332,10 @@ public abstract class Level : TileMap
                     tempEntity = allEntities[i];
                     allEntities[i] = allEntities[i + gap];
                     allEntities[i + gap] = tempEntity;
-
                 }
             }
 
             gap--;
-
         }
     }
 
@@ -364,16 +350,22 @@ public abstract class Level : TileMap
             try
             {
                 coordToEntity.Add(allEntities[i].pos, allEntities[i]);//Adds the position of the entity as it's key
+            }
+            catch (Exception) { }
+            try
+            {
+                
                 oldCoordToEntity.Add(allEntities[i].prevPos, allEntities[i]);//Separate dictionaries to avoid problems
             }
             catch (Exception e)
             {
-                GD.Print("[Level] exception in UpdatePositionDictionary" + e);
                 continue;
             }
 
             
         }
     }
+
+
 
 }

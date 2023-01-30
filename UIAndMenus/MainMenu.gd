@@ -8,7 +8,6 @@ var playerCharacter : int = 0
 var team : int = 1
 var chosenTeam :int = 0
 var numberOfPlayer : int = 1
-var waitForMultiplayer : bool = false
 
 #Camera positions for menus
 var back :Array = [Vector2(0,0)]
@@ -44,12 +43,8 @@ func MoveCameraTo(var destination : int):
 			camera.position = SOLO
 		2:#character selection
 			camera.position = CHARSELECT
-			
 		3:#level selection
 			camera.position = LEVELSELECT
-
-
-
 
 func SetGame(mode : int):
 	

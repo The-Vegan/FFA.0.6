@@ -13,6 +13,9 @@ public class Entity : AnimatedSprite
     protected AnimationPlayer animPlayer;
 
     public byte team = 0;
+
+    protected String nameTag;
+    public String GetNametag() { return nameTag; }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //DEPENDENCIES
 
@@ -30,6 +33,12 @@ public class Entity : AnimatedSprite
 
     [Signal]
     public delegate void noteHiter( bool volontary);
+
+    protected short perfectBeats = 0;
+    protected short missedBeats = 0;
+
+    public short GetPerBeat() { return perfectBeats; }
+    public short GetMisBeat() { return missedBeats; }
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //MOVEMENT RELATED
 
@@ -53,6 +62,8 @@ public class Entity : AnimatedSprite
     protected List<List<Dictionary<String, short>>> LEFTATK = new List<List<Dictionary<String, short>>>();
     protected List<List<Dictionary<String, short>>> RIGHTATK = new List<List<Dictionary<String, short>>>();
     protected List<List<Dictionary<String, short>>> UPATK = new List<List<Dictionary<String, short>>>();
+
+    protected bool permaDeath = false;
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //ATTACK VARIABLES
 
@@ -71,18 +82,22 @@ public class Entity : AnimatedSprite
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
     //CTF
 
-    public void Init(Level level,PackedScene c)
+    public void Init(Level level,PackedScene c,String name)
     {
+        this.map = level;
+        this.controllerScene = c;
+        this.nameTag = name;
         
-        animPlayer = (AnimationPlayer)this.GetNode("AnimationPlayer");
-        map = level;
-        controllerScene = c;
-
-        
-        
+    }
+    public void Init(Level level, PackedScene c)
+    {
+        this.map = level;
+        this.controllerScene = c;
+        this.nameTag = "Bobby";
     }
     public override void _Ready()
     {
+        animPlayer = (AnimationPlayer)this.GetNode("AnimationPlayer");
         tween = (Tween)this.GetNode("Tween");
         controller = controllerScene.Instance() as GenericController;
         this.AddChild(controller);
@@ -278,12 +293,15 @@ public class Entity : AnimatedSprite
 
     protected void Death()
     {
+        map.SetCell((int)pos.x, (int)pos.y, 0);//Makes tile walkable again
+
+        if (permaDeath){QueueFree(); return;}
+
+
         for(int i = 1;i < damagedBy.Count; i++)
         {
             damagedBy[i].HitSomeone((short) (50/(damagedBy.Count - 1)));//Distributes 50 points between all killers
         }
-
-        map.SetCell((int)pos.x, (int)pos.y, 0);//Makes tile walkable again
 
         prevPos = Vector2.NegOne;//Prevents further damage
         pos = Vector2.NegOne;
@@ -295,7 +313,7 @@ public class Entity : AnimatedSprite
     }
 
 
-    public void HitSomeone(short points) 
+    public virtual void HitSomeone(short points) 
     {
         this.itemBar += points;
         this.blunderBar -= (short)(points >> 2);
@@ -307,6 +325,12 @@ public class Entity : AnimatedSprite
     public void ResetHealth()
     {
         healthPoint = maxHP;
+    }
+
+    public void RestoreHealth(short hp)
+    {
+        this.healthPoint += hp;
+        if (healthPoint > maxHP) healthPoint = maxHP;
     }
 
     //*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\\
@@ -338,9 +362,10 @@ public class Entity : AnimatedSprite
         {
             cooldown--;
             ResetBeatValues();
+            GD.Print("[Entity] has cooldown-- = " + cooldown);
             return;
         }
-        if(packet == 0)
+        if (packet == 0)
         {
             this.Play("FailedInput");
             action = "Idle";

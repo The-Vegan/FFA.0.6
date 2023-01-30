@@ -11,16 +11,18 @@ func _ready():
 	pass # Replace with function body.
 
 func _pressed():
-	GenerateLevel(mainMenu.playerCharacter,mainMenu.gameMode)
-
-func GenerateLevel(character : int , mode : int):
 	loadedLevel = lvlToLoad.instance()
 	
 	loadedLevel.connect("loadComplete",self,"LevelLoaded")
 	
-	loadedLevel.InitPlayerAndMode(character,mode,12,mainMenu.team,mainMenu.chosenTeam,mainMenu.waitForMultiplayer)
-	
-	
+	loadedLevel.InitPlayerAndMode(#The following are the arguments
+	mainMenu.playerCharacter,
+	mainMenu.gameMode,
+	12,#number of players
+	mainMenu.team,
+	mainMenu.chosenTeam)
+
+
 
 func LevelLoaded(success : bool):
 	print("LoadCompleted In MainMenu")
