@@ -9,6 +9,9 @@ var team : int = 1
 var chosenTeam :int = 0
 var numberOfPlayer : int = 1
 
+var numberOfEntities : int = 12
+var numberOfPlayers : int = 1
+
 #Camera positions for menus
 var back :Array = [Vector2(0,0)]
 const MAINMENU = Vector2(0,0)
