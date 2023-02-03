@@ -1,4 +1,4 @@
-[gd_scene load_steps=139 format=2]
+[gd_scene load_steps=142 format=2]
 
 [ext_resource path="res://UIAndMenus/Button Theme/FullButtonAnim.png" type="Texture" id=1]
 [ext_resource path="res://UIAndMenus/DestinationButton/Back.gd" type="Script" id=2]
@@ -16,7 +16,10 @@
 [ext_resource path="res://UIAndMenus/Button Theme/ButtonTheme.tres" type="Theme" id=14]
 [ext_resource path="res://Entities/Blahaj/PortraitBlahaj.png" type="Texture" id=15]
 [ext_resource path="res://Entities/Pirate/PortraitPirate.png" type="Texture" id=16]
-[ext_resource path="res://UIAndMenus/EndScreen/EndScreenLabels.tres" type="Theme" id=17]
+[ext_resource path="res://UIAndMenus/CharacterButton/CharacterButton.gd" type="Script" id=18]
+[ext_resource path="res://UIAndMenus/Monstropis.gd" type="Script" id=19]
+[ext_resource path="res://UIAndMenus/CharacterButton/RandomPortraint.png" type="Texture" id=20]
+[ext_resource path="res://Entities/Monstropis/MonstropisPortrait.png" type="Texture" id=21]
 
 [sub_resource type="AtlasTexture" id=50]
 atlas = ExtResource( 1 )
@@ -635,6 +638,24 @@ icon_align = 1
 expand_icon = true
 script = ExtResource( 9 )
 
+[node name="Monstropis" type="Button" parent="CharacterSelect"]
+margin_left = 64.0
+margin_top = 192.0
+margin_right = 192.0
+margin_bottom = 320.0
+icon = ExtResource( 21 )
+expand_icon = true
+script = ExtResource( 19 )
+
+[node name="Random" type="Button" parent="CharacterSelect"]
+margin_left = 256.0
+margin_top = 192.0
+margin_right = 384.0
+margin_bottom = 320.0
+icon = ExtResource( 20 )
+expand_icon = true
+script = ExtResource( 18 )
+
 [node name="Back" type="Button" parent="CharacterSelect"]
 margin_left = 768.0
 margin_top = 448.0
@@ -697,7 +718,13 @@ frames = SubResource( 170 )
 animation = "Normal"
 centered = false
 
-[node name="Button" type="Button" parent="LevelSelect"]
-margin_right = 12.0
-margin_bottom = 20.0
-theme = ExtResource( 17 )
+[node name="SpinBox" type="SpinBox" parent="LevelSelect"]
+margin_top = 444.0
+margin_right = 100.0
+margin_bottom = 576.0
+theme = ExtResource( 14 )
+min_value = 4.0
+max_value = 16.0
+value = 12.0
+rounded = true
+prefix = "Fighters :"

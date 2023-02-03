@@ -69,14 +69,18 @@ func SetGame(mode : int):
 func setCharacter(character : int):
 	playerCharacter = character;
 	
-	match(character):
+	match(playerCharacter):
 		0:#None
 			print("Random")
 		1:#Pirate
 			print("Pirate")
 		2:#Blahaj
 			print("Blahaj")
-	pass
+		3:#Monstropis
+			print("Monstropis")
+		_:
+			print("Err -> Random, ID is : " + str(playerCharacter))
+
 
 
 func DisplayErr():
