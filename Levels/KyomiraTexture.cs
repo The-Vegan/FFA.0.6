@@ -15,7 +15,7 @@ public class KyomiraTexture : TileMap
 
         sbyte textureIDOffset =(sbyte)(newLight - state);
 
-        GD.Print("[Kyomira1] TextureOffset is : " + textureIDOffset);
+        GD.Print("[KyomiraTexture] TextureOffset is : " + textureIDOffset);
 
         var tiles = this.GetUsedCells();
 
